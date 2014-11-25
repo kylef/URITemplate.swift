@@ -11,6 +11,11 @@
 		77356D8C1A253325002822CF /* URITemplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77356D801A253325002822CF /* URITemplate.framework */; };
 		77356D931A253325002822CF /* URITemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77356D921A253325002822CF /* URITemplateTests.swift */; };
 		77356D9D1A2534BE002822CF /* URITemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77356D9C1A2534BE002822CF /* URITemplate.swift */; };
+		77356DA61A254642002822CF /* extended-tests.json in Resources */ = {isa = PBXBuildFile; fileRef = 77356D9F1A254642002822CF /* extended-tests.json */; };
+		77356DA81A254642002822CF /* negative-tests.json in Resources */ = {isa = PBXBuildFile; fileRef = 77356DA11A254642002822CF /* negative-tests.json */; };
+		77356DAA1A254642002822CF /* spec-examples-by-section.json in Resources */ = {isa = PBXBuildFile; fileRef = 77356DA31A254642002822CF /* spec-examples-by-section.json */; };
+		77356DAB1A254642002822CF /* spec-examples.json in Resources */ = {isa = PBXBuildFile; fileRef = 77356DA41A254642002822CF /* spec-examples.json */; };
+		77356DAE1A254673002822CF /* URITemplateCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77356DAD1A254673002822CF /* URITemplateCases.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,6 +36,11 @@
 		77356D911A253325002822CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		77356D921A253325002822CF /* URITemplateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URITemplateTests.swift; sourceTree = "<group>"; };
 		77356D9C1A2534BE002822CF /* URITemplate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URITemplate.swift; sourceTree = "<group>"; };
+		77356D9F1A254642002822CF /* extended-tests.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "extended-tests.json"; sourceTree = "<group>"; };
+		77356DA11A254642002822CF /* negative-tests.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "negative-tests.json"; sourceTree = "<group>"; };
+		77356DA31A254642002822CF /* spec-examples-by-section.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "spec-examples-by-section.json"; sourceTree = "<group>"; };
+		77356DA41A254642002822CF /* spec-examples.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "spec-examples.json"; sourceTree = "<group>"; };
+		77356DAD1A254673002822CF /* URITemplateCases.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URITemplateCases.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +104,8 @@
 			isa = PBXGroup;
 			children = (
 				77356D921A253325002822CF /* URITemplateTests.swift */,
+				77356DAD1A254673002822CF /* URITemplateCases.swift */,
+				77356D9E1A254642002822CF /* Cases */,
 				77356D901A253325002822CF /* Supporting Files */,
 			);
 			path = URITemplateTests;
@@ -105,6 +117,17 @@
 				77356D911A253325002822CF /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		77356D9E1A254642002822CF /* Cases */ = {
+			isa = PBXGroup;
+			children = (
+				77356D9F1A254642002822CF /* extended-tests.json */,
+				77356DA11A254642002822CF /* negative-tests.json */,
+				77356DA31A254642002822CF /* spec-examples-by-section.json */,
+				77356DA41A254642002822CF /* spec-examples.json */,
+			);
+			path = Cases;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -204,6 +227,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				77356DA61A254642002822CF /* extended-tests.json in Resources */,
+				77356DA81A254642002822CF /* negative-tests.json in Resources */,
+				77356DAB1A254642002822CF /* spec-examples.json in Resources */,
+				77356DAA1A254642002822CF /* spec-examples-by-section.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -222,6 +249,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				77356DAE1A254673002822CF /* URITemplateCases.swift in Sources */,
 				77356D931A253325002822CF /* URITemplateTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

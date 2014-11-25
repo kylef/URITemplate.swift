@@ -62,7 +62,7 @@ public struct URITemplate : Printable, Equatable {
   }
 
   // Expand template as a URI Template using the given variables
-  public func expand(variables:[String:String]) -> String {
+  public func expand(variables:[String:AnyObject]) -> String {
     return template
   }
 }
