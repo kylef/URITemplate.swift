@@ -1,0 +1,6 @@
+language: objective-c
+before_install:
+  - gem install cocoapods
+  - gem install xcpretty
+script:
+  - set -o pipefail && xcodebuild -project URITemplate.xcodeproj -scheme URITemplate test | xcpretty -c
