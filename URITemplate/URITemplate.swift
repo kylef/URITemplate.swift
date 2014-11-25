@@ -60,6 +60,11 @@ public struct URITemplate : Printable, Equatable {
 
     return variables
   }
+
+  // Expand template as a URI Template using the given variables
+  public func expand(variables:[String:String]) -> String {
+    return template
+  }
 }
 
 public func ==(lhs:URITemplate, rhs:URITemplate) -> Bool {

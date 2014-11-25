@@ -81,3 +81,8 @@ class URITemplateVariablesTests : XCTestCase {
     XCTAssertEqual(template.variables(), ["continuation"])
   }
 }
+
+// MARK: Expansion
+
+class URITemplateExpansionTests : XCTestCase {
+}
