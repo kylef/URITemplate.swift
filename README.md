@@ -11,3 +11,8 @@ Swift implementation of URI Template (RFC6570).
 let template = URITemplate(template: "http://{domain}/")
 template.expand(["domain": "kylefuller.co.uk"])
 ```
+
+## License
+
+Stencil is licensed under the MIT license. See [LICENSE](LICENSE) for more
+info.
