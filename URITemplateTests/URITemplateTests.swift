@@ -6,31 +6,31 @@
 //  Copyright (c) 2014 Kyle Fuller. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 import XCTest
+import URITemplate
 
 class URITemplateTests: XCTestCase {
-    
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-    
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
-    }
-    
-    func testExample() {
-        // This is an example of a functional test case.
-        XCTAssert(true, "Pass")
-    }
-    
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measureBlock() {
-            // Put the code you want to measure the time of here.
-        }
-    }
-    
+
+  // MARK: Printable
+
+  func testPrintable() {
+    let template = URITemplate(template:"{scheme}://{hostname}/")
+    XCTAssertEqual("\(template)", "{scheme}://{hostname}/")
+  }
+
+  // MARK: Equatable
+
+  func testEquatable() {
+    let template1 = URITemplate(template:"{scheme}://{hostname}/")
+    let template2 = URITemplate(template:"{scheme}://{hostname}/")
+    XCTAssertEqual(template1, template2)
+  }
+
+  func testEquatableUnequalObjects() {
+    let template1 = URITemplate(template:"{scheme}://{hostname}/")
+    let template2 = URITemplate(template:"{scheme}://{hostname}{path}")
+    XCTAssertNotEqual(template1, template2)
+  }
+
 }

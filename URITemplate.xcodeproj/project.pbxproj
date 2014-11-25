@@ -10,6 +10,7 @@
 		77356D861A253325002822CF /* URITemplate.h in Headers */ = {isa = PBXBuildFile; fileRef = 77356D851A253325002822CF /* URITemplate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		77356D8C1A253325002822CF /* URITemplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77356D801A253325002822CF /* URITemplate.framework */; };
 		77356D931A253325002822CF /* URITemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77356D921A253325002822CF /* URITemplateTests.swift */; };
+		77356D9D1A2534BE002822CF /* URITemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77356D9C1A2534BE002822CF /* URITemplate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +30,7 @@
 		77356D8B1A253325002822CF /* URITemplateTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = URITemplateTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		77356D911A253325002822CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		77356D921A253325002822CF /* URITemplateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URITemplateTests.swift; sourceTree = "<group>"; };
+		77356D9C1A2534BE002822CF /* URITemplate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URITemplate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +76,7 @@
 			isa = PBXGroup;
 			children = (
 				77356D851A253325002822CF /* URITemplate.h */,
+				77356D9C1A2534BE002822CF /* URITemplate.swift */,
 				77356D831A253325002822CF /* Supporting Files */,
 			);
 			path = URITemplate;
@@ -211,6 +214,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				77356D9D1A2534BE002822CF /* URITemplate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -317,6 +321,7 @@
 		77356D971A253325002822CF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -328,12 +333,14 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		77356D981A253325002822CF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;

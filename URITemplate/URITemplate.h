@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Kyle Fuller. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
 //! Project version number for URITemplate.
 FOUNDATION_EXPORT double URITemplateVersionNumber;
