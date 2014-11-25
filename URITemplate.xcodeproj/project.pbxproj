@@ -57,7 +57,9 @@
 				77356D8F1A253325002822CF /* URITemplateTests */,
 				77356D811A253325002822CF /* Products */,
 			);
+			indentWidth = 2;
 			sourceTree = "<group>";
+			tabWidth = 2;
 		};
 		77356D811A253325002822CF /* Products */ = {
 			isa = PBXGroup;
@@ -397,6 +399,7 @@
 				77356D981A253325002822CF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		77356D991A253325002822CF /* Build configuration list for PBXNativeTarget "URITemplateTests" */ = {
 			isa = XCConfigurationList;
@@ -405,6 +408,7 @@
 				77356D9B1A253325002822CF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
