@@ -8,95 +8,6 @@
 
 import Foundation
 
-struct Expander {
-  let prefix:String
-  let joiner:String
-  let handler:((String, String?) -> String)
-
-  init(prefix:String, joiner:String, handler:((String, String?) -> String)) {
-    self.prefix = prefix
-    self.joiner = joiner
-    self.handler = handler
-  }
-}
-
-func handler(expansion:((variable:String, value:String) -> (String)))(variable:String, value:String?) -> String {
-  if let value = value {
-    return value
-  }
-
-  return ""
-}
-
-func expandPercentEscaped(variable:String, value:String?) -> String {
-  if let value = value {
-    return value.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
-  }
-
-  return ""
-}
-
-func expandPercentEncoded(variable:String, value:String?) -> String {
-  if let value = value {
-    return value.percentEncoded()
-  }
-
-  return ""
-}
-
-func expandValue(variable:String, value:String?) -> String {
-  if let value = value {
-    return value
-  }
-
-  return ""
-}
-
-func expandKeyValue(variable:String, value:String?) -> String {
-  if let value = value {
-    return "\(variable)=\(value)"
-  }
-
-  return ""
-}
-
-// MARK: Extensions
-
-extension NSRegularExpression {
-  func substitute(string:String, block:((String) -> (String))) -> String {
-    let oldString = string as NSString
-    let range = NSRange(location: 0, length: oldString.length)
-    var newString = string as NSString
-
-    let matches = matchesInString(string, options: NSMatchingOptions(0), range: range)
-    for match in matches.reverse() {
-      let expression = oldString.substringWithRange(match.range)
-      let replacement = block(expression)
-      newString = newString.stringByReplacingCharactersInRange(match.range, withString: replacement)
-    }
-
-    return newString
-  }
-
-  func matches(string:String) -> [String] {
-    let input = string as NSString
-    let range = NSRange(location: 0, length: input.length)
-    let results = matchesInString(input, options: NSMatchingOptions(0), range: range)
-
-    return results.map { result -> String in
-      let checkingResult = result as NSTextCheckingResult
-      var range = checkingResult.range
-      return input.substringWithRange(range)
-    }
-  }
-}
-
-extension String {
-  func percentEncoded() -> String {
-    return CFURLCreateStringByAddingPercentEscapes(nil, self, nil, ":/?&=;+!@#$()',*", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding))
-  }
-}
-
 // MARK: URITemplate
 
 public struct URITemplate : Printable, Equatable, StringLiteralConvertible, ExtendedGraphemeClusterLiteralConvertible, UnicodeScalarLiteralConvertible {
@@ -209,4 +120,87 @@ public struct URITemplate : Printable, Equatable, StringLiteralConvertible, Exte
 
 public func ==(lhs:URITemplate, rhs:URITemplate) -> Bool {
   return lhs.template == rhs.template
+}
+
+// MARK: Extensions
+
+extension NSRegularExpression {
+  func substitute(string:String, block:((String) -> (String))) -> String {
+    let oldString = string as NSString
+    let range = NSRange(location: 0, length: oldString.length)
+    var newString = string as NSString
+
+    let matches = matchesInString(string, options: NSMatchingOptions(0), range: range)
+    for match in matches.reverse() {
+      let expression = oldString.substringWithRange(match.range)
+      let replacement = block(expression)
+      newString = newString.stringByReplacingCharactersInRange(match.range, withString: replacement)
+    }
+
+    return newString
+  }
+
+  func matches(string:String) -> [String] {
+    let input = string as NSString
+    let range = NSRange(location: 0, length: input.length)
+    let results = matchesInString(input, options: NSMatchingOptions(0), range: range)
+
+    return results.map { result -> String in
+      let checkingResult = result as NSTextCheckingResult
+      var range = checkingResult.range
+      return input.substringWithRange(range)
+    }
+  }
+}
+
+extension String {
+  func percentEncoded() -> String {
+    return CFURLCreateStringByAddingPercentEscapes(nil, self, nil, ":/?&=;+!@#$()',*", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding))
+  }
+}
+
+// MARK: Expansion
+
+struct Expander {
+  let prefix:String
+  let joiner:String
+  let handler:((String, String?) -> String)
+
+  init(prefix:String, joiner:String, handler:((String, String?) -> String)) {
+    self.prefix = prefix
+    self.joiner = joiner
+    self.handler = handler
+  }
+}
+
+func expandPercentEscaped(variable:String, value:String?) -> String {
+  if let value = value {
+    return value.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
+  }
+
+  return ""
+}
+
+func expandPercentEncoded(variable:String, value:String?) -> String {
+  if let value = value {
+    return value.percentEncoded()
+  }
+
+  return ""
+}
+
+func expandValue(variable:String, value:String?) -> String {
+  if let value = value {
+    return value
+  }
+
+  return ""
+}
+
+func expandKeyValue(variable:String, value:String?) -> String {
+  if let value = value {
+    return "\(variable)=\(value)"
+  }
+
+  return ""
 }
