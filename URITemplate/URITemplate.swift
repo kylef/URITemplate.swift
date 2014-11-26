@@ -8,6 +8,28 @@
 
 import Foundation
 
+extension NSRegularExpression {
+  func substitute(string:String, block:((String) -> (String))) -> String {
+    let oldString = string as NSString
+    let range = NSRange(location: 0, length: oldString.length)
+    var newString = string as NSString
+
+    enumerateMatchesInString(string, options: NSMatchingOptions(0), range: range) { (result, flags, bool) -> Void in
+      let expression = oldString.substringWithRange(result.range)
+      let replacement = block(expression)
+      newString = newString.stringByReplacingCharactersInRange(result.range, withString: replacement)
+    }
+
+    return newString
+  }
+}
+
+extension String {
+  func percentEncoded() -> String {
+    return CFURLCreateStringByAddingPercentEscapes(nil, self, nil, ":/?&=;+!@#$()',*", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding))
+  }
+}
+
 public struct URITemplate : Printable, Equatable {
   let template:String
 
@@ -63,14 +85,15 @@ public struct URITemplate : Printable, Equatable {
 
   // Expand template as a URI Template using the given variables
   public func expand(variables:[String:AnyObject]) -> String {
-    var expansion = template
+    return regex.substitute(template) { string in
+      let expression = string.substringWithRange(string.startIndex.successor()..<string.endIndex.predecessor())
 
-    for (variable, value) in variables {
-      let escapedValue = CFURLCreateStringByAddingPercentEscapes(nil, "\(value)", nil, ":/?&=;+!@#$()',*", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding))
-      expansion = expansion.stringByReplacingOccurrencesOfString("{\(variable)}", withString: escapedValue, options: NSStringCompareOptions(0), range: nil)
+      if let value: AnyObject = variables[expression] {
+        return "\(value)".percentEncoded()
+      }
+
+      return ""
     }
-
-    return expansion
   }
 }
 
