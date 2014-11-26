@@ -85,17 +85,24 @@ public struct URITemplate : Printable, Equatable {
 
   // Expand template as a URI Template using the given variables
   public func expand(variables:[String:AnyObject]) -> String {
-    return regex.substitute(template) { string in
-      let expression = string.substringWithRange(string.startIndex.successor()..<string.endIndex.predecessor())
+    let operatorHandlers:Dictionary<String, (String -> String)> = [
+      "+": { string -> String in string.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)! },
+    ]
 
-      if expression.hasPrefix("+") {
-        if let value: AnyObject = variables[expression.substringFromIndex(expression.startIndex.successor())] {
-          return "\(value)".stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
-        }
+    return regex.substitute(template) { string in
+      var expression = string.substringWithRange(string.startIndex.successor()..<string.endIndex.predecessor())
+
+      let firstCharacter = expression.substringToIndex(expression.startIndex.successor())
+      var handler:(String -> String)! = operatorHandlers[firstCharacter]
+
+      if let handler = handler {
+        expression = expression.substringFromIndex(expression.startIndex.successor())
+      } else {
+        handler = { string -> String in string.percentEncoded() }
       }
 
       if let value: AnyObject = variables[expression] {
-        return "\(value)".percentEncoded()
+        return handler("\(value)")
       }
 
       return ""
