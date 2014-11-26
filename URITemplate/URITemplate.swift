@@ -26,10 +26,11 @@ extension NSRegularExpression {
     let range = NSRange(location: 0, length: oldString.length)
     var newString = string as NSString
 
-    enumerateMatchesInString(string, options: NSMatchingOptions(0), range: range) { (result, flags, bool) -> Void in
-      let expression = oldString.substringWithRange(result.range)
+    let matches = matchesInString(string, options: NSMatchingOptions(0), range: range)
+    for match in matches.reverse() {
+      let expression = oldString.substringWithRange(match.range)
       let replacement = block(expression)
-      newString = newString.stringByReplacingCharactersInRange(result.range, withString: replacement)
+      newString = newString.stringByReplacingCharactersInRange(match.range, withString: replacement)
     }
 
     return newString
