@@ -24,5 +24,5 @@ let variables = template.variables()
 
 ## License
 
-Stencil is licensed under the MIT license. See [LICENSE](LICENSE) for more
+URITemplate is licensed under the MIT license. See [LICENSE](LICENSE) for more
 info.

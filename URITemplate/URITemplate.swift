@@ -10,6 +10,7 @@ import Foundation
 
 // MARK: URITemplate
 
+/// A data structure to represent an RFC6570 URI template.
 public struct URITemplate : Printable, Equatable, StringLiteralConvertible, ExtendedGraphemeClusterLiteralConvertible, UnicodeScalarLiteralConvertible {
   let template:String
 
@@ -46,7 +47,7 @@ public struct URITemplate : Printable, Equatable, StringLiteralConvertible, Exte
     return template
   }
 
-  // Returns the set of keywords in the URI Template
+  /// Returns the set of keywords in the URI Template
   public var variables:[String] {
     let expressions = regex.matches(template).map { expression in
       // Removes the { and } from the expression
@@ -75,7 +76,7 @@ public struct URITemplate : Printable, Equatable, StringLiteralConvertible, Exte
     }
   }
 
-  // Expand template as a URI Template using the given variables
+  /// Expand template as a URI Template using the given variables
   public func expand(variables:[String:AnyObject]) -> String {
     let operatorHandlers:Dictionary<String, Expander> = [
       "+": Expander(prefix: "", joiner: ",", expandPercentEscaped),
