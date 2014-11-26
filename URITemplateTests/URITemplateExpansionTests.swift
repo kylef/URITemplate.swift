@@ -40,4 +40,16 @@ class URITemplateExpansionTests: XCTestCase {
     let expanded = template.expand(["who": "kyle"])
     XCTAssertEqual(expanded, ";who=kyle")
   }
+
+  func testFormStyleQueryExpansion() {
+    let template = URITemplate(template:"{?who}")
+    let expanded = template.expand(["who": "kyle"])
+    XCTAssertEqual(expanded, "?who=kyle")
+  }
+
+  func testFormStyleQueryContinuationExpansion() {
+    let template = URITemplate(template:"{&who}")
+    let expanded = template.expand(["who": "kyle"])
+    XCTAssertEqual(expanded, "&who=kyle")
+  }
 }

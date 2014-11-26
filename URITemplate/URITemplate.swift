@@ -102,6 +102,8 @@ public struct URITemplate : Printable, Equatable {
       "#": Expander(prefix: "#", joiner: ",", { (key, string) -> String in string.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)! }),
       ".": Expander(prefix: ".", joiner: ",", { (key, string) -> String in string }),
       ";": Expander(prefix: ";", joiner: ",", { (key, string) -> String in "\(key)=\(string)" }),
+      "&": Expander(prefix: "&", joiner: "&", { (key, string) -> String in "\(key)=\(string)" }),
+      "?": Expander(prefix: "?", joiner: "&", { (key, string) -> String in "\(key)=\(string)" }),
     ]
 
     return regex.substitute(template) { string in
