@@ -29,7 +29,7 @@ class URITemplateExpansionTests : XCTestCase {
   }
 
   func testExpansion() {
-    let supportedLevel = 0
+    let supportedLevel = 1
     let fixtures = files.map(loadFixture)
 
     for fixture in fixtures {
@@ -43,7 +43,7 @@ class URITemplateExpansionTests : XCTestCase {
         }
 
         for testcase in testcases {
-          if supportedLevel > level {
+          if supportedLevel >= level {
             let template = testcase[0] as String
             let expected = testcase[1] as String
 

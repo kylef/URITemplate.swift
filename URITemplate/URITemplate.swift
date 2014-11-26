@@ -63,7 +63,14 @@ public struct URITemplate : Printable, Equatable {
 
   // Expand template as a URI Template using the given variables
   public func expand(variables:[String:AnyObject]) -> String {
-    return template
+    var expansion = template
+
+    for (variable, value) in variables {
+      let escapedValue = CFURLCreateStringByAddingPercentEscapes(nil, "\(value)", nil, ":/?&=;+!@#$()',*", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding))
+      expansion = expansion.stringByReplacingOccurrencesOfString("{\(variable)}", withString: escapedValue, options: NSStringCompareOptions(0), range: nil)
+    }
+
+    return expansion
   }
 }
 
