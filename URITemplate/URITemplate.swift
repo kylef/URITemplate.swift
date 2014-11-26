@@ -147,7 +147,11 @@ public struct URITemplate : Printable, Equatable, StringLiteralConvertible, Exte
       }
 
       for component in expression.componentsSeparatedByString(",") {
-        variables.append(component)
+        if component.hasSuffix("*") {
+          variables.append(component.substringToIndex(expression.endIndex.predecessor()))
+        } else {
+          variables.append(component)
+        }
       }
     }
 

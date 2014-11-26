@@ -57,4 +57,9 @@ class URITemplateVariablesTests : XCTestCase {
     let template = URITemplate(template:"test/{&continuation}")
     XCTAssertEqual(template.variables(), ["continuation"])
   }
+
+  func testHandlesCompositeValues() {
+    let template = URITemplate(template:"{/list*}")
+    XCTAssertEqual(template.variables(), ["list"])
+  }
 }
