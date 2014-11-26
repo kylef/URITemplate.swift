@@ -7,13 +7,19 @@ Swift implementation of URI Template ([RFC6570](https://tools.ietf.org/html/rfc6
 
 ## Example
 
+### Expanding a URI Template
+
 ```swift
 let template = URITemplate(template: "https://api.github.com/repos/{owner}/{repo}/")
 let url = template.expand(["owner": "kylef", "repo": "URITemplate.swift"])
-let variables = template.variables()
+=> "https://api.github.com/repos/kylef/URITemplate.swift/"
+```
 
-// url = "https://api.github.com/repos/kylef/URITemplate.swift/"
-// variables = ["owner", "repo"]
+### Determine which variables are in a template
+
+```swift
+let variables = template.variables()
+=> ["owner", "repo"]
 ```
 
 ## License
