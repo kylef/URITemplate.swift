@@ -100,10 +100,11 @@ public struct URITemplate : Printable, Equatable {
     let operatorHandlers:Dictionary<String, Expander> = [
       "+": Expander(prefix: "", joiner: ",", { (key, string) -> String in string.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)! }),
       "#": Expander(prefix: "#", joiner: ",", { (key, string) -> String in string.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)! }),
-      ".": Expander(prefix: ".", joiner: ",", { (key, string) -> String in string }),
-      ";": Expander(prefix: ";", joiner: ",", { (key, string) -> String in "\(key)=\(string)" }),
+      ".": Expander(prefix: ".", joiner: ".", { (key, string) -> String in string }),
+      ";": Expander(prefix: ";", joiner: ";", { (key, string) -> String in "\(key)=\(string)" }),
       "&": Expander(prefix: "&", joiner: "&", { (key, string) -> String in "\(key)=\(string)" }),
       "?": Expander(prefix: "?", joiner: "&", { (key, string) -> String in "\(key)=\(string)" }),
+      "/": Expander(prefix: "/", joiner: "/", { (key, string) -> String in string }),
     ]
 
     return regex.substitute(template) { string in
@@ -120,10 +121,11 @@ public struct URITemplate : Printable, Equatable {
 
       return expander.prefix + expander.joiner.join(expression.componentsSeparatedByString(",").map { variable -> String in
         if let value: AnyObject = variables[variable] {
-          return expander.handler(expression, "\(value)")
+          return expander.handler(variable, "\(value)")
         }
 
-        return ""
+        // TODO: Some operators don't need to be treated diff
+        return expander.handler(variable, "")
       })
     }
   }
