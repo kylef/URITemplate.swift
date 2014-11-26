@@ -88,6 +88,12 @@ public struct URITemplate : Printable, Equatable {
     return regex.substitute(template) { string in
       let expression = string.substringWithRange(string.startIndex.successor()..<string.endIndex.predecessor())
 
+      if expression.hasPrefix("+") {
+        if let value: AnyObject = variables[expression.substringFromIndex(expression.startIndex.successor())] {
+          return "\(value)".stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
+        }
+      }
+
       if let value: AnyObject = variables[expression] {
         return "\(value)".percentEncoded()
       }
