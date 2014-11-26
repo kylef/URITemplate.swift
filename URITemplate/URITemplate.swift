@@ -20,6 +20,48 @@ struct Expander {
   }
 }
 
+func handler(expansion:((variable:String, value:String) -> (String)))(variable:String, value:String?) -> String {
+  if let value = value {
+    return value
+  }
+
+  return ""
+}
+
+func expandPercentEscaped(variable:String, value:String?) -> String {
+  if let value = value {
+    return value.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
+  }
+
+  return ""
+}
+
+func expandPercentEncoded(variable:String, value:String?) -> String {
+  if let value = value {
+    return value.percentEncoded()
+  }
+
+  return ""
+}
+
+func expandValue(variable:String, value:String?) -> String {
+  if let value = value {
+    return value
+  }
+
+  return ""
+}
+
+func expandKeyValue(variable:String, value:String?) -> String {
+  if let value = value {
+    return "\(variable)=\(value)"
+  }
+
+  return ""
+}
+
+// MARK: Extensions
+
 extension NSRegularExpression {
   func substitute(string:String, block:((String) -> (String))) -> String {
     let oldString = string as NSString
@@ -42,6 +84,8 @@ extension String {
     return CFURLCreateStringByAddingPercentEscapes(nil, self, nil, ":/?&=;+!@#$()',*", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding))
   }
 }
+
+// MARK: URITemplate
 
 public struct URITemplate : Printable, Equatable {
   let template:String
@@ -99,27 +143,9 @@ public struct URITemplate : Printable, Equatable {
   // Expand template as a URI Template using the given variables
   public func expand(variables:[String:AnyObject]) -> String {
     let operatorHandlers:Dictionary<String, Expander> = [
-      "+": Expander(prefix: "", joiner: ",", { (key, string) -> String in
-        if let string = string {
-          return string.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
-        }
-
-        return ""
-      }),
-      "#": Expander(prefix: "#", joiner: ",", { (key, string) -> String in
-        if let string = string {
-          return string.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
-        }
-
-        return ""
-      }),
-      ".": Expander(prefix: ".", joiner: ".", { (key, string) -> String in
-        if let string = string {
-          return string
-        }
-
-        return ""
-      }),
+      "+": Expander(prefix: "", joiner: ",", expandPercentEscaped),
+      "#": Expander(prefix: "#", joiner: ",", expandPercentEscaped),
+      ".": Expander(prefix: ".", joiner: ".", expandValue),
       ";": Expander(prefix: ";", joiner: ";", { (key, string) -> String in
         if let string = string {
           if countElements(string) > 0 {
@@ -129,27 +155,9 @@ public struct URITemplate : Printable, Equatable {
 
         return "\(key)"
       }),
-      "&": Expander(prefix: "&", joiner: "&", { (key, string) -> String in
-        if let string = string {
-          return "\(key)=\(string)"
-        }
-
-        return ""
-      }),
-      "?": Expander(prefix: "?", joiner: "&", { (key, string) -> String in
-        if let string = string {
-          return "\(key)=\(string)"
-        }
-
-        return ""
-      }),
-      "/": Expander(prefix: "/", joiner: "/", { (key, string) -> String in
-        if let string = string {
-          return string
-        }
-
-        return ""
-      }),
+      "&": Expander(prefix: "&", joiner: "&", expandKeyValue),
+      "?": Expander(prefix: "?", joiner: "&", expandKeyValue),
+      "/": Expander(prefix: "/", joiner: "/", expandValue),
     ]
 
     return regex.substitute(template) { string in
@@ -161,13 +169,7 @@ public struct URITemplate : Printable, Equatable {
       if let expander = expander {
         expression = expression.substringFromIndex(expression.startIndex.successor())
       } else {
-        expander = Expander(prefix: "", joiner: ",") { _x, string -> String in
-          if let string = string {
-            return string.percentEncoded()
-          }
-
-          return ""
-        }
+        expander = Expander(prefix: "", joiner: ",", expandPercentEncoded)
       }
 
       return expander.prefix + expander.joiner.join(expression.componentsSeparatedByString(",").map { variable -> String in
