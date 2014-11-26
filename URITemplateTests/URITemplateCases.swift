@@ -45,11 +45,14 @@ class URITemplateCasesTests : XCTestCase {
         for testcase in testcases {
           if supportedLevel >= level {
             let template = testcase[0] as String
-            let expected = testcase[1] as String
-
             let uritemplate = URITemplate(template: template)
+            let expanded = uritemplate.expand(variables)
 
-            XCTAssertEqual(uritemplate.expand(variables), expected, "\(template)")
+            if let expected = testcase[1] as? String {
+              XCTAssertEqual(expanded, expected, "\(template)")
+            } else if let expected = testcase[1] as? [String] {
+              XCTAssertTrue(contains(expected, expanded), "\(template)")
+            }
           }
         }
       }
