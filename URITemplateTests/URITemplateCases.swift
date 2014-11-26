@@ -29,7 +29,7 @@ class URITemplateCasesTests : XCTestCase {
   }
 
   func testExpansion() {
-    let supportedLevel = 2
+    let supportedLevel = 3
     let fixtures = files.map(loadFixture)
 
     for fixture in fixtures {

@@ -11,9 +11,9 @@ import Foundation
 struct Expander {
   let prefix:String
   let joiner:String
-  let handler:((String, String) -> String)
+  let handler:((String, String?) -> String)
 
-  init(prefix:String, joiner:String, handler:((String, String) -> String)) {
+  init(prefix:String, joiner:String, handler:((String, String?) -> String)) {
     self.prefix = prefix
     self.joiner = joiner
     self.handler = handler
@@ -98,13 +98,57 @@ public struct URITemplate : Printable, Equatable {
   // Expand template as a URI Template using the given variables
   public func expand(variables:[String:AnyObject]) -> String {
     let operatorHandlers:Dictionary<String, Expander> = [
-      "+": Expander(prefix: "", joiner: ",", { (key, string) -> String in string.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)! }),
-      "#": Expander(prefix: "#", joiner: ",", { (key, string) -> String in string.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)! }),
-      ".": Expander(prefix: ".", joiner: ".", { (key, string) -> String in string }),
-      ";": Expander(prefix: ";", joiner: ";", { (key, string) -> String in "\(key)=\(string)" }),
-      "&": Expander(prefix: "&", joiner: "&", { (key, string) -> String in "\(key)=\(string)" }),
-      "?": Expander(prefix: "?", joiner: "&", { (key, string) -> String in "\(key)=\(string)" }),
-      "/": Expander(prefix: "/", joiner: "/", { (key, string) -> String in string }),
+      "+": Expander(prefix: "", joiner: ",", { (key, string) -> String in
+        if let string = string {
+          return string.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
+        }
+
+        return ""
+      }),
+      "#": Expander(prefix: "#", joiner: ",", { (key, string) -> String in
+        if let string = string {
+          return string.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
+        }
+
+        return ""
+      }),
+      ".": Expander(prefix: ".", joiner: ".", { (key, string) -> String in
+        if let string = string {
+          return string
+        }
+
+        return ""
+      }),
+      ";": Expander(prefix: ";", joiner: ";", { (key, string) -> String in
+        if let string = string {
+          if countElements(string) > 0 {
+            return "\(key)=\(string)"
+          }
+        }
+
+        return "\(key)"
+      }),
+      "&": Expander(prefix: "&", joiner: "&", { (key, string) -> String in
+        if let string = string {
+          return "\(key)=\(string)"
+        }
+
+        return ""
+      }),
+      "?": Expander(prefix: "?", joiner: "&", { (key, string) -> String in
+        if let string = string {
+          return "\(key)=\(string)"
+        }
+
+        return ""
+      }),
+      "/": Expander(prefix: "/", joiner: "/", { (key, string) -> String in
+        if let string = string {
+          return string
+        }
+
+        return ""
+      }),
     ]
 
     return regex.substitute(template) { string in
@@ -116,7 +160,13 @@ public struct URITemplate : Printable, Equatable {
       if let expander = expander {
         expression = expression.substringFromIndex(expression.startIndex.successor())
       } else {
-        expander = Expander(prefix: "", joiner: ",") { _x, string -> String in string.percentEncoded() }
+        expander = Expander(prefix: "", joiner: ",") { _x, string -> String in
+          if let string = string {
+            return string.percentEncoded()
+          }
+
+          return ""
+        }
       }
 
       return expander.prefix + expander.joiner.join(expression.componentsSeparatedByString(",").map { variable -> String in
@@ -124,8 +174,7 @@ public struct URITemplate : Printable, Equatable {
           return expander.handler(variable, "\(value)")
         }
 
-        // TODO: Some operators don't need to be treated diff
-        return expander.handler(variable, "")
+        return expander.handler(variable, nil)
       })
     }
   }
