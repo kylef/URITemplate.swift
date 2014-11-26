@@ -87,7 +87,7 @@ extension String {
 
 // MARK: URITemplate
 
-public struct URITemplate : Printable, Equatable {
+public struct URITemplate : Printable, Equatable, StringLiteralConvertible, ExtendedGraphemeClusterLiteralConvertible, UnicodeScalarLiteralConvertible {
   let template:String
 
   var regex:NSRegularExpression {
@@ -103,6 +103,20 @@ public struct URITemplate : Printable, Equatable {
 
   public init(template:String) {
     self.template = template
+  }
+
+  public typealias ExtendedGraphemeClusterLiteralType = StringLiteralType
+  public init(extendedGraphemeClusterLiteral value: ExtendedGraphemeClusterLiteralType) {
+    template = value
+  }
+
+  public typealias UnicodeScalarLiteralType = StringLiteralType
+  public init(unicodeScalarLiteral value: UnicodeScalarLiteralType) {
+    template = value
+  }
+
+  public init(stringLiteral value: StringLiteralType) {
+    template = value
   }
 
   public var description:String {
