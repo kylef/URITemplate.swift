@@ -85,24 +85,27 @@ public struct URITemplate : Printable, Equatable {
 
   // Expand template as a URI Template using the given variables
   public func expand(variables:[String:AnyObject]) -> String {
-    let operatorHandlers:Dictionary<String, (String -> String)> = [
-      "+": { string -> String in string.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)! },
+    let operatorHandlers:Dictionary<String, ((String, String) -> String)> = [
+      "+": { (key, string) -> String in string.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)! },
+      "#": { (key, string) -> String in "#\(string.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!)" },
+      ".": { (key, string) -> String in ".\(string)" },
+      ";": { (key, string) -> String in ";\(key)=\(string)" },
     ]
 
     return regex.substitute(template) { string in
       var expression = string.substringWithRange(string.startIndex.successor()..<string.endIndex.predecessor())
 
       let firstCharacter = expression.substringToIndex(expression.startIndex.successor())
-      var handler:(String -> String)! = operatorHandlers[firstCharacter]
+      var handler:((String, String) -> String)! = operatorHandlers[firstCharacter]
 
       if let handler = handler {
         expression = expression.substringFromIndex(expression.startIndex.successor())
       } else {
-        handler = { string -> String in string.percentEncoded() }
+        handler = { _x, string -> String in string.percentEncoded() }
       }
 
       if let value: AnyObject = variables[expression] {
-        return handler("\(value)")
+        return handler(expression, "\(value)")
       }
 
       return ""

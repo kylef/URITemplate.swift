@@ -10,7 +10,7 @@ import Foundation
 import XCTest
 import URITemplate
 
-class URITemplateExpansionTests : XCTestCase {
+class URITemplateCasesTests : XCTestCase {
   let files = [
     "extended-tests",
 //    "negative-tests",

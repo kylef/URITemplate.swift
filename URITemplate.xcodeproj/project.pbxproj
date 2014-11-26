@@ -17,6 +17,7 @@
 		77356DAB1A254642002822CF /* spec-examples.json in Resources */ = {isa = PBXBuildFile; fileRef = 77356DA41A254642002822CF /* spec-examples.json */; };
 		77356DAE1A254673002822CF /* URITemplateCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77356DAD1A254673002822CF /* URITemplateCases.swift */; };
 		77356DB01A255A40002822CF /* URITemplateVariablesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77356DAF1A255A40002822CF /* URITemplateVariablesTests.swift */; };
+		77356DB21A255A7E002822CF /* URITemplateExpansionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77356DB11A255A7E002822CF /* URITemplateExpansionTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,6 +44,7 @@
 		77356DA41A254642002822CF /* spec-examples.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "spec-examples.json"; sourceTree = "<group>"; };
 		77356DAD1A254673002822CF /* URITemplateCases.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URITemplateCases.swift; sourceTree = "<group>"; };
 		77356DAF1A255A40002822CF /* URITemplateVariablesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URITemplateVariablesTests.swift; sourceTree = "<group>"; };
+		77356DB11A255A7E002822CF /* URITemplateExpansionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URITemplateExpansionTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,6 +108,7 @@
 			isa = PBXGroup;
 			children = (
 				77356D921A253325002822CF /* URITemplateTests.swift */,
+				77356DB11A255A7E002822CF /* URITemplateExpansionTests.swift */,
 				77356DAF1A255A40002822CF /* URITemplateVariablesTests.swift */,
 				77356DAD1A254673002822CF /* URITemplateCases.swift */,
 				77356D9E1A254642002822CF /* Cases */,
@@ -254,6 +257,7 @@
 			files = (
 				77356DB01A255A40002822CF /* URITemplateVariablesTests.swift in Sources */,
 				77356DAE1A254673002822CF /* URITemplateCases.swift in Sources */,
+				77356DB21A255A7E002822CF /* URITemplateExpansionTests.swift in Sources */,
 				77356D931A253325002822CF /* URITemplateTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
