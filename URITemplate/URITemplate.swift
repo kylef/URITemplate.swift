@@ -136,32 +136,32 @@ public struct URITemplate : Printable, Equatable, StringLiteralConvertible, Exte
   }
 
   // Returns the set of keywords in the URI Template
-  public func variables() -> [String] {
-    let expressions = regex.matches(template).map { match in
-      match.substringWithRange(match.startIndex.successor()..<match.endIndex.predecessor())
+  public var variables:[String] {
+    let expressions = regex.matches(template).map { expression in
+      // Removes the { and } from the expression
+      expression.substringWithRange(expression.startIndex.successor()..<expression.endIndex.predecessor())
     }
 
-    var variables = [String]()
-    for expression in expressions {
+    return expressions.map { expression -> [String] in
       var expression = expression
 
-      for op in operators {
+      for op in self.operators {
         if expression.hasPrefix(op) {
           expression = expression.substringFromIndex(expression.startIndex.successor())
           break
         }
       }
 
-      for component in expression.componentsSeparatedByString(",") {
+      return expression.componentsSeparatedByString(",").map { component in
         if component.hasSuffix("*") {
-          variables.append(component.substringToIndex(expression.endIndex.predecessor()))
+          return component.substringToIndex(expression.endIndex.predecessor())
         } else {
-          variables.append(component)
+          return component
         }
       }
+    }.reduce([]) { initial, expressions -> [String] in
+      return initial + expressions
     }
-
-    return variables
   }
 
   // Expand template as a URI Template using the given variables
