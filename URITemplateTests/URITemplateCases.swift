@@ -51,7 +51,7 @@ class URITemplateCasesTests : XCTestCase {
             if let expected = testcase[1] as? String {
               XCTAssertEqual(expanded, expected, "\(template)")
             } else if let expected = testcase[1] as? [String] {
-              XCTAssertTrue(contains(expected, expanded), "\(template)")
+              XCTAssertTrue(contains(expected, expanded), "\(template). \(expected[0]) !~ \(expanded)")
             }
           }
         }
