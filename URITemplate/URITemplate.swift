@@ -77,6 +77,18 @@ extension NSRegularExpression {
 
     return newString
   }
+
+  func matches(string:String) -> [String] {
+    let input = string as NSString
+    let range = NSRange(location: 0, length: input.length)
+    let results = matchesInString(input, options: NSMatchingOptions(0), range: range)
+
+    return results.map { result -> String in
+      let checkingResult = result as NSTextCheckingResult
+      var range = checkingResult.range
+      return input.substringWithRange(range)
+    }
+  }
 }
 
 extension String {
@@ -125,14 +137,8 @@ public struct URITemplate : Printable, Equatable, StringLiteralConvertible, Exte
 
   // Returns the set of keywords in the URI Template
   public func variables() -> [String] {
-    let templateString = template as NSString
-    let results = regex.matchesInString(templateString, options: NSMatchingOptions(0), range: NSRange(location: 0, length: templateString.length))
-    let expressions = results.map { result -> String in
-      let checkingResult = result as NSTextCheckingResult
-      var range = checkingResult.range
-      range.location += 1
-      range.length -= 2
-      return templateString.substringWithRange(range)
+    let expressions = regex.matches(template).map { match in
+      match.substringWithRange(match.startIndex.successor()..<match.endIndex.predecessor())
     }
 
     var variables = [String]()
