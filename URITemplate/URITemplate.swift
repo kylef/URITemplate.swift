@@ -117,6 +117,35 @@ public struct URITemplate : Printable, Equatable, StringLiteralConvertible, Exte
       })
     }
   }
+
+  /// Extract the variables used in a given URL
+  public func extract(url:String) -> Dictionary<String, String> {
+    let regex = NSRegularExpression(pattern: "\\{([^\\}]+)\\}", options: NSRegularExpressionOptions(0), error: nil)!
+    let pattern = regex.substitute(self.template) { expression in
+      if expression.hasPrefix("{") && expression.hasSuffix("}") {
+        return "(.*)"
+      } else {
+        return NSRegularExpression.escapedPatternForString(expression)
+      }
+    }
+
+    let expression = NSRegularExpression(pattern: "^\(pattern)$", options: NSRegularExpressionOptions(0), error: nil)
+    if let expression = expression {
+      let matches = expression.matches(url)
+
+      var extractedVariables = Dictionary<String, String>()
+
+      if matches.count == variables.count {
+        for index in 0..<matches.count {
+          extractedVariables[variables[index]] = matches[index].stringByRemovingPercentEncoding
+        }
+      }
+
+      return extractedVariables
+    }
+
+    return [:]
+  }
 }
 
 public func ==(lhs:URITemplate, rhs:URITemplate) -> Bool {

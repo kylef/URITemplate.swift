@@ -22,6 +22,13 @@ let variables = template.variables()
 => ["owner", "repo"]
 ```
 
+### Extract the variables used in a given URL
+
+```swift
+let variables = template.extract("https://api.github.com/repos/kylef/PathKit/")
+=> ["owner":"kylef", "repo":"PathKit"]
+```
+
 ## License
 
 URITemplate is licensed under the MIT license. See [LICENSE](LICENSE) for more

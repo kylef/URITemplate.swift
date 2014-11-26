@@ -58,4 +58,44 @@ class URITemplateCasesTests : XCTestCase {
       }
     }
   }
+
+  func testExtract() {
+    let supportedLevel = 1
+    let fixtures = files.map(loadFixture)
+
+    for fixture in fixtures {
+      for (name, value) in fixture {
+        let testsuite = value as Dictionary<String, AnyObject>
+        let variables = testsuite["variables"] as Dictionary<String, AnyObject>
+        let testcases = testsuite["testcases"] as [AnyObject]
+        var level = 4
+        if let testLevel = testsuite["level"] as? Int {
+          level = testLevel
+        }
+
+        for testcase in testcases {
+          if supportedLevel >= level {
+            let template = testcase[0] as String
+            let uritemplate = URITemplate(template: template)
+
+            var matchingVariables = Dictionary<String, String>()
+            for key in uritemplate.variables {
+              if let value:AnyObject = variables[key] as AnyObject? {
+                matchingVariables[key] = "\(value)"
+              }
+            }
+
+            if let url = testcase[1] as? String {
+              let urivariables = uritemplate.extract(url)
+              XCTAssertEqual(urivariables as NSDictionary, matchingVariables as NSDictionary, "\(template)")
+            } else if let urls = testcase[1] as? [String] {
+              let url = urls[0]
+              let urivariables = uritemplate.extract(url)
+              XCTAssertEqual(urivariables as NSDictionary, matchingVariables as NSDictionary, "\(template)")
+            }
+          }
+        }
+      }
+    }
+  }
 }

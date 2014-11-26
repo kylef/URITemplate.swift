@@ -18,6 +18,7 @@
 		77356DAE1A254673002822CF /* URITemplateCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77356DAD1A254673002822CF /* URITemplateCases.swift */; };
 		77356DB01A255A40002822CF /* URITemplateVariablesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77356DAF1A255A40002822CF /* URITemplateVariablesTests.swift */; };
 		77356DB21A255A7E002822CF /* URITemplateExpansionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77356DB11A255A7E002822CF /* URITemplateExpansionTests.swift */; };
+		779F8C721A262A6800F7C9DF /* URITemplateExtractTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 779F8C711A262A6800F7C9DF /* URITemplateExtractTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +46,7 @@
 		77356DAD1A254673002822CF /* URITemplateCases.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URITemplateCases.swift; sourceTree = "<group>"; };
 		77356DAF1A255A40002822CF /* URITemplateVariablesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URITemplateVariablesTests.swift; sourceTree = "<group>"; };
 		77356DB11A255A7E002822CF /* URITemplateExpansionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URITemplateExpansionTests.swift; sourceTree = "<group>"; };
+		779F8C711A262A6800F7C9DF /* URITemplateExtractTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URITemplateExtractTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +112,7 @@
 				77356D921A253325002822CF /* URITemplateTests.swift */,
 				77356DB11A255A7E002822CF /* URITemplateExpansionTests.swift */,
 				77356DAF1A255A40002822CF /* URITemplateVariablesTests.swift */,
+				779F8C711A262A6800F7C9DF /* URITemplateExtractTests.swift */,
 				77356DAD1A254673002822CF /* URITemplateCases.swift */,
 				77356D9E1A254642002822CF /* Cases */,
 				77356D901A253325002822CF /* Supporting Files */,
@@ -257,6 +260,7 @@
 			files = (
 				77356DB01A255A40002822CF /* URITemplateVariablesTests.swift in Sources */,
 				77356DAE1A254673002822CF /* URITemplateCases.swift in Sources */,
+				779F8C721A262A6800F7C9DF /* URITemplateExtractTests.swift in Sources */,
 				77356DB21A255A7E002822CF /* URITemplateExpansionTests.swift in Sources */,
 				77356D931A253325002822CF /* URITemplateTests.swift in Sources */,
 			);
