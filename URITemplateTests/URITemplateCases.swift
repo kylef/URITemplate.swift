@@ -19,7 +19,7 @@ class URITemplateCasesTests : XCTestCase {
   ]
 
   let supportedExpansionLevel = 3
-  let supportedExtractionLevel = 1
+  let supportedExtractionLevel = 2
 
   func testExpansion() {
     for suite in suites(supportedExpansionLevel) {

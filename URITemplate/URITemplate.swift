@@ -120,7 +120,7 @@ public struct URITemplate : Printable, Equatable, StringLiteralConvertible, Exte
 
   /// Extract the variables used in a given URL
   public func extract(url:String) -> Dictionary<String, String> {
-    let regex = NSRegularExpression(pattern: "\\{([^\\}]+)\\}", options: NSRegularExpressionOptions(0), error: nil)!
+    let regex = NSRegularExpression(pattern: "(\\{([^\\}]+)\\})|[^(.*)]", options: NSRegularExpressionOptions(0), error: nil)!
     let pattern = regex.substitute(self.template) { expression in
       if expression.hasPrefix("{") && expression.hasSuffix("}") {
         return "(.*)"
