@@ -18,84 +18,114 @@ class URITemplateCasesTests : XCTestCase {
     "spec-examples"
   ]
 
-  func loadFixture(named:String) -> Dictionary<String, AnyObject> {
-    let bundle = NSBundle(forClass:object_getClass(self))
-    let path = bundle.URLForResource(named, withExtension: "json")!
-    let data = NSData(contentsOfURL: path)!
-    var error:NSError?
-    let object: AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &error)
-    assert(error == nil)
-    return object as Dictionary<String, AnyObject>
-  }
+  let supportedExpansionLevel = 3
+  let supportedExtractionLevel = 1
 
   func testExpansion() {
-    let supportedLevel = 3
-    let fixtures = files.map(loadFixture)
+    for suite in suites(supportedExpansionLevel) {
+      for testcase in suite.cases {
+        let expanded = testcase.uriTemplate.expand(suite.variables)
+        XCTAssertTrue(contains(testcase.expected, expanded), "\(testcase.template). \(testcase.expected[0]) !~ \(expanded)")
+      }
+    }
+  }
 
-    for fixture in fixtures {
-      for (name, value) in fixture {
-        let testsuite = value as Dictionary<String, AnyObject>
-        let variables = testsuite["variables"] as Dictionary<String, AnyObject>
-        let testcases = testsuite["testcases"] as [AnyObject]
-        var level = 4
-        if let testLevel = testsuite["level"] as? Int {
-          level = testLevel
-        }
+  func testExtraction() {
+    for suite in suites(supportedExtractionLevel) {
+      for testcase in suite.cases {
+        let template = testcase.uriTemplate
 
-        for testcase in testcases {
-          if supportedLevel >= level {
-            let template = testcase[0] as String
-            let uritemplate = URITemplate(template: template)
-            let expanded = uritemplate.expand(variables)
-
-            if let expected = testcase[1] as? String {
-              XCTAssertEqual(expanded, expected, "\(template)")
-            } else if let expected = testcase[1] as? [String] {
-              XCTAssertTrue(contains(expected, expanded), "\(template). \(expected[0]) !~ \(expanded)")
+        for uri in testcase.expected {
+          let variables = template.extract(uri)
+          var expectedVariables = Dictionary<String, String>()
+          for variable in template.variables {
+            if let value:AnyObject = variables[variable] as AnyObject? {
+              expectedVariables[variable] = "\(value)"
+            } else {
+              XCTAssert(false, "Missign Variable \(variable)")
             }
           }
+
+          XCTAssertEqual(variables as NSDictionary, expectedVariables as NSDictionary, "\(template)")
         }
       }
     }
   }
 
-  func testExtract() {
-    let supportedLevel = 1
-    let fixtures = files.map(loadFixture)
+  // MARK:
 
-    for fixture in fixtures {
-      for (name, value) in fixture {
-        let testsuite = value as Dictionary<String, AnyObject>
-        let variables = testsuite["variables"] as Dictionary<String, AnyObject>
-        let testcases = testsuite["testcases"] as [AnyObject]
-        var level = 4
-        if let testLevel = testsuite["level"] as? Int {
-          level = testLevel
-        }
+  func suites(level:Int) -> [Suite] {
+    let bundle = NSBundle(forClass:object_getClass(self))
+    let urls = files.map { file -> NSURL in
+      bundle.URLForResource(file, withExtension: "json")!
+    }
 
-        for testcase in testcases {
-          if supportedLevel >= level {
-            let template = testcase[0] as String
-            let uritemplate = URITemplate(template: template)
-
-            var matchingVariables = Dictionary<String, String>()
-            for key in uritemplate.variables {
-              if let value:AnyObject = variables[key] as AnyObject? {
-                matchingVariables[key] = "\(value)"
-              }
-            }
-
-            if let url = testcase[1] as? String {
-              let urivariables = uritemplate.extract(url)
-              XCTAssertEqual(urivariables as NSDictionary, matchingVariables as NSDictionary, "\(template)")
-            } else if let urls = testcase[1] as? [String] {
-              let url = urls[0]
-              let urivariables = uritemplate.extract(url)
-              XCTAssertEqual(urivariables as NSDictionary, matchingVariables as NSDictionary, "\(template)")
-            }
-          }
-        }
-      }
+    return loadSuites(urls).filter { suite in
+      level >= suite.level
     }
   }
 }
+
+// MARK: Suite Structures
+
+struct Suite {
+  let name:String
+  let variables:Dictionary<String, AnyObject>
+  let cases:[Case]
+  let level:Int
+
+  init(name:String, testSuite:Dictionary<String, AnyObject>) {
+    self.name = name
+    variables = testSuite["variables"] as Dictionary<String, AnyObject>
+    let testcases = testSuite["testcases"] as [[AnyObject]]
+    cases = testcases.map { Case(object:$0) }
+
+    level = 4
+    if let testLevel = testSuite["level"] as? Int {
+      level = testLevel
+    }
+  }
+}
+
+struct Case {
+  let template:String
+  let expected:[String]
+
+  init(object:[AnyObject]) {
+    template = object[0] as String
+    if let expected = object[1] as? [String] {
+      self.expected = expected
+    } else {
+      expected = [object[1] as String]
+    }
+  }
+
+  var uriTemplate:URITemplate {
+    return URITemplate(template:template)
+  }
+}
+
+// MARK: Loading suite methods
+
+func loadFixture(URL:NSURL) -> Dictionary<String, AnyObject> {
+  let data = NSData(contentsOfURL: URL)!
+  var error:NSError?
+  let object: AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &error)
+  assert(error == nil)
+  return object as Dictionary<String, AnyObject>
+}
+
+func loadSuites(urls:[NSURL]) -> [Suite] {
+  var suites = [Suite]()
+
+  for url in urls {
+    for (key, value) in loadFixture(url) {
+      if let testsuite = value as? Dictionary<String, AnyObject> {
+        suites.append(Suite(name:key, testSuite:testsuite))
+      }
+    }
+  }
+
+  return suites
+}
+
