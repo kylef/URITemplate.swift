@@ -29,6 +29,18 @@ let variables = template.extract("https://api.github.com/repos/kylef/PathKit/")
 => ["owner":"kylef", "repo":"PathKit"]
 ```
 
+## [RFC6570](https://tools.ietf.org/html/rfc6570)
+
+The URITemplate library follows the [test suite](https://github.com/uri-templates/uritemplate-test).
+
+The different functions inside URITemplate support different levels of RFC6570. Full level 4 support across all functions is desired and currently work in progress.
+
+| Component   | Compliance     |
+|:-----------:|:--------------:|
+| `variables` | Full (Level 4) |
+| `expand`    | Level 3        |
+| `extract`   | Level 1        |
+
 ## License
 
 URITemplate is licensed under the MIT license. See [LICENSE](LICENSE) for more
