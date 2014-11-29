@@ -32,6 +32,14 @@ class URITemplateTests: XCTestCase {
     XCTAssertNotEqual(template1, template2)
   }
 
+  // MARK: Hashable
+
+  func testHashValue() {
+    let template1 = URITemplate(template:"{scheme}://{hostname}/")
+    let template2 = URITemplate(template:"{scheme}://{hostname}/")
+    XCTAssertEqual(template1.hashValue, template2.hashValue)
+  }
+
   // MARK: StringLiteralConvertible
 
   func testStringLiteralConvertible() {

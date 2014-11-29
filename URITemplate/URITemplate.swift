@@ -11,7 +11,7 @@ import Foundation
 // MARK: URITemplate
 
 /// A data structure to represent an RFC6570 URI template.
-public struct URITemplate : Printable, Equatable, StringLiteralConvertible, ExtendedGraphemeClusterLiteralConvertible, UnicodeScalarLiteralConvertible {
+public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvertible, ExtendedGraphemeClusterLiteralConvertible, UnicodeScalarLiteralConvertible {
   let template:String
 
   var regex:NSRegularExpression {
@@ -45,6 +45,10 @@ public struct URITemplate : Printable, Equatable, StringLiteralConvertible, Exte
 
   public var description:String {
     return template
+  }
+
+  public var hashValue:Int {
+    return template.hashValue
   }
 
   /// Returns the set of keywords in the URI Template
