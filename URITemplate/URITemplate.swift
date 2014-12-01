@@ -75,9 +75,7 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
           return component
         }
       }
-    }.reduce([]) { initial, expressions -> [String] in
-      return initial + expressions
-    }
+    }.reduce([], +)
   }
 
   /// Expand template as a URI Template using the given variables
