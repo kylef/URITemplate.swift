@@ -42,7 +42,7 @@ class URITemplateCasesTests : XCTestCase {
             if let value:AnyObject = variables[variable] as AnyObject? {
               expectedVariables[variable] = "\(value)"
             } else {
-              XCTAssert(false, "Missign Variable \(variable)")
+              XCTAssert(false, "Missing Variable \(variable)")
             }
           }
 
