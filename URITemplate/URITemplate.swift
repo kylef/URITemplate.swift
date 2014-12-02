@@ -116,8 +116,8 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
       }
 
       return op!.prefix + op!.joiner.join(expression.componentsSeparatedByString(",").map { variable -> String in
-        if let value: AnyObject = variables[variable] {
-          return op!.expand(variable, value: "\(value)", prefix:prefix)
+        if let value:AnyObject = variables[variable] {
+          return op!.expand(variable, value: value, prefix:prefix)
         }
 
         return op!.expand(variable, value:nil, prefix:prefix)
@@ -208,13 +208,18 @@ protocol Operator {
   /// Character to use to join expanded components
   var joiner:String { get }
 
-  func expand(variable:String, value:String?, prefix:Int?) -> String
+  func expand(variable:String, value:AnyObject?, prefix:Int?) -> String
 }
 
 class BaseOperator {
-  func expand(variable:String, value:String?, prefix:Int?) -> String {
-    if let value = value {
-      let expandedValue = expand(value: value)
+  func expand(variable:String, value:AnyObject?, prefix:Int?) -> String {
+    if var value:AnyObject = value {
+      var expandedValue:String!
+      if let values = value as? [AnyObject] {
+        expandedValue = ",".join(values.map { self.expand(value: "\($0)") })
+      } else {
+        expandedValue = expand(value: "\(value)")
+      }
 
       if let prefix = prefix {
         if countElements(expandedValue) > prefix {
@@ -287,8 +292,9 @@ class PathStyleParameterExpansion : BaseOperator, Operator {
   var prefix:String { return ";" }
   var joiner:String { return ";" }
 
-  override func expand(variable:String, value:String?, prefix:Int?) -> String {
-    if let value = value {
+  override func expand(variable:String, value:AnyObject?, prefix:Int?) -> String {
+    if let value:AnyObject = value {
+      let value = "\(value)"
       if countElements(value) > 0 {
         return "\(variable)=\(value)"
       }
@@ -304,8 +310,8 @@ class FormStyleQueryExpansion : BaseOperator, Operator {
   var prefix:String { return "?" }
   var joiner:String { return "&" }
 
-  override func expand(variable:String, value:String?, prefix:Int?) -> String {
-    if let value = value {
+  override func expand(variable:String, value:AnyObject?, prefix:Int?) -> String {
+    if let value:AnyObject = value {
       return "\(variable)=\(value)"
     }
 
@@ -319,8 +325,8 @@ class FormStyleQueryContinuation : BaseOperator, Operator {
   var prefix:String { return "&" }
   var joiner:String { return "&" }
 
-  override func expand(variable:String, value:String?, prefix:Int?) -> String {
-    if let value = value {
+  override func expand(variable:String, value:AnyObject?, prefix:Int?) -> String {
+    if let value:AnyObject = value {
       return "\(variable)=\(value)"
     }
 
