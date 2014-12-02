@@ -92,6 +92,7 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
   /// Expand template as a URI Template using the given variables
   public func expand(variables:[String:AnyObject]) -> String {
     return regex.substitute(template) { string in
+      var prefix:Int?
       var expression = string.substringWithRange(string.startIndex.successor()..<string.endIndex.predecessor())
       let firstCharacter = expression.substringToIndex(expression.startIndex.successor())
 
@@ -109,12 +110,17 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
         op = self.operators.first
       }
 
+      if let range = expression.rangeOfString(":") {
+        prefix = expression.substringFromIndex(range.endIndex).toInt()
+        expression = expression.substringToIndex(range.startIndex)
+      }
+
       return op!.prefix + op!.joiner.join(expression.componentsSeparatedByString(",").map { variable -> String in
         if let value: AnyObject = variables[variable] {
-          return op!.expand(variable, value: "\(value)")
+          return op!.expand(variable, value: "\(value)", prefix:prefix)
         }
 
-        return op!.expand(variable, value:nil)
+        return op!.expand(variable, value:nil, prefix:prefix)
       })
     }
   }
@@ -202,13 +208,22 @@ protocol Operator {
   /// Character to use to join expanded components
   var joiner:String { get }
 
-  func expand(variable:String, value:String?) -> String
+  func expand(variable:String, value:String?, prefix:Int?) -> String
 }
 
 class BaseOperator {
-  func expand(variable:String, value:String?) -> String {
+  func expand(variable:String, value:String?, prefix:Int?) -> String {
     if let value = value {
-        return expand(value: value)
+      let expandedValue = expand(value: value)
+
+      if let prefix = prefix {
+        if countElements(expandedValue) > prefix {
+          let index = advance(expandedValue.startIndex, prefix)
+          return expandedValue.substringToIndex(index)
+        }
+      }
+
+      return expandedValue
     }
 
     return ""
@@ -272,7 +287,7 @@ class PathStyleParameterExpansion : BaseOperator, Operator {
   var prefix:String { return ";" }
   var joiner:String { return ";" }
 
-  override func expand(variable:String, value:String?) -> String {
+  override func expand(variable:String, value:String?, prefix:Int?) -> String {
     if let value = value {
       if countElements(value) > 0 {
         return "\(variable)=\(value)"
@@ -289,7 +304,7 @@ class FormStyleQueryExpansion : BaseOperator, Operator {
   var prefix:String { return "?" }
   var joiner:String { return "&" }
 
-  override func expand(variable:String, value:String?) -> String {
+  override func expand(variable:String, value:String?, prefix:Int?) -> String {
     if let value = value {
       return "\(variable)=\(value)"
     }
@@ -304,7 +319,7 @@ class FormStyleQueryContinuation : BaseOperator, Operator {
   var prefix:String { return "&" }
   var joiner:String { return "&" }
 
-  override func expand(variable:String, value:String?) -> String {
+  override func expand(variable:String, value:String?, prefix:Int?) -> String {
     if let value = value {
       return "\(variable)=\(value)"
     }
