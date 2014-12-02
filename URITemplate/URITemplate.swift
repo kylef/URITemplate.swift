@@ -21,8 +21,17 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
     return expression!
   }
 
-  var operators:[String] {
-    return ["+", "#", ".", "/", ";", "?", "&", "|", "!", "@"]
+  var operators:[Operator] {
+    return [
+      StringExpansion(),
+      ReservedExpansion(),
+      FragmentExpansion(),
+      LabelExpansion(),
+      PathSegmentExpansion(),
+      PathStyleParameterExpansion(),
+      FormStyleQueryExpansion(),
+      FormStyleQueryContinuation(),
+    ]
   }
 
   public init(template:String) {
@@ -62,9 +71,11 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
       var expression = expression
 
       for op in self.operators {
-        if expression.hasPrefix(op) {
-          expression = expression.substringFromIndex(expression.startIndex.successor())
-          break
+        if let op = op.op {
+          if expression.hasPrefix(op) {
+            expression = expression.substringFromIndex(expression.startIndex.successor())
+            break
+          }
         }
       }
 
@@ -80,42 +91,30 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
 
   /// Expand template as a URI Template using the given variables
   public func expand(variables:[String:AnyObject]) -> String {
-    let operatorHandlers:Dictionary<String, Expander> = [
-      "+": Expander(prefix: "", joiner: ",", expandPercentEscaped),
-      "#": Expander(prefix: "#", joiner: ",", expandPercentEscaped),
-      ".": Expander(prefix: ".", joiner: ".", expandValue),
-      ";": Expander(prefix: ";", joiner: ";", { (key, string) -> String in
-        if let string = string {
-          if countElements(string) > 0 {
-            return "\(key)=\(string)"
-          }
-        }
-
-        return "\(key)"
-      }),
-      "&": Expander(prefix: "&", joiner: "&", expandKeyValue),
-      "?": Expander(prefix: "?", joiner: "&", expandKeyValue),
-      "/": Expander(prefix: "/", joiner: "/", expandValue),
-    ]
-
     return regex.substitute(template) { string in
       var expression = string.substringWithRange(string.startIndex.successor()..<string.endIndex.predecessor())
-
       let firstCharacter = expression.substringToIndex(expression.startIndex.successor())
-      var expander:Expander! = operatorHandlers[firstCharacter]
 
-      if let expander = expander {
-        expression = expression.substringFromIndex(expression.startIndex.successor())
-      } else {
-        expander = Expander(prefix: "", joiner: ",", expandPercentEncoded)
-      }
-
-      return expander.prefix + expander.joiner.join(expression.componentsSeparatedByString(",").map { variable -> String in
-        if let value: AnyObject = variables[variable] {
-          return expander.handler(variable, "\(value)")
+      var op = self.operators.filter {
+        if let op = $0.op {
+          return op == firstCharacter
         }
 
-        return expander.handler(variable, nil)
+        return false
+      }.first
+
+      if (op != nil) {
+        expression = expression.substringFromIndex(expression.startIndex.successor())
+      } else {
+        op = self.operators.first
+      }
+
+      return op!.prefix + op!.joiner.join(expression.componentsSeparatedByString(",").map { variable -> String in
+        if let value: AnyObject = variables[variable] {
+          return op!.expand(variable, value: "\(value)")
+        }
+
+        return op!.expand(variable, value:nil)
       })
     }
   }
@@ -191,48 +190,125 @@ extension String {
   }
 }
 
-// MARK: Expansion
+// MARK: Operators
 
-struct Expander {
-  let prefix:String
-  let joiner:String
-  let handler:((String, String?) -> String)
+protocol Operator {
+  /// Operator
+  var op:String? { get }
 
-  init(prefix:String, joiner:String, handler:((String, String?) -> String)) {
-    self.prefix = prefix
-    self.joiner = joiner
-    self.handler = handler
-  }
+  /// Prefix for the expanded string
+  var prefix:String { get }
+
+  /// Character to use to join expanded components
+  var joiner:String { get }
+
+  func expand(variable:String, value:String?) -> String
 }
 
-func expandPercentEscaped(variable:String, value:String?) -> String {
-  if let value = value {
-    return value.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
+class BaseOperator {
+  func expand(variable:String, value:String?) -> String {
+    if let value = value {
+        return expand(value: value)
+    }
+
+    return ""
   }
 
-  return ""
-}
-
-func expandPercentEncoded(variable:String, value:String?) -> String {
-  if let value = value {
-    return value.percentEncoded()
-  }
-
-  return ""
-}
-
-func expandValue(variable:String, value:String?) -> String {
-  if let value = value {
+  func expand(# value:String) -> String {
     return value
   }
-
-  return ""
 }
 
-func expandKeyValue(variable:String, value:String?) -> String {
-  if let value = value {
-    return "\(variable)=\(value)"
-  }
+/// RFC6570 (3.2.2) Simple String Expansion: {var}
+class StringExpansion : BaseOperator, Operator {
+  var op:String? { return nil }
+  var prefix:String { return "" }
+  var joiner:String { return "," }
 
-  return ""
+  override func expand(# value:String) -> String {
+    return value.percentEncoded()
+  }
+}
+
+/// RFC6570 (3.2.3) Reserved Expansion: {+var}
+class ReservedExpansion : BaseOperator, Operator {
+  var op:String? { return "+" }
+  var prefix:String { return "" }
+  var joiner:String { return "," }
+
+  override func expand(# value:String) -> String {
+    return value.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
+  }
+}
+
+/// RFC6570 (3.2.4) Fragment Expansion {#var}
+class FragmentExpansion : BaseOperator, Operator {
+  var op:String? { return "#" }
+  var prefix:String { return "#" }
+  var joiner:String { return "," }
+
+  override func expand(# value:String) -> String {
+    return value.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
+  }
+}
+
+/// RFC6570 (3.2.5) Label Expansion with Dot-Prefix: {.var}
+class LabelExpansion : BaseOperator, Operator {
+  var op:String? { return "." }
+  var prefix:String { return "." }
+  var joiner:String { return "." }
+}
+
+/// RFC6570 (3.2.6) Path Segment Expansion: {/var}
+class PathSegmentExpansion : BaseOperator, Operator {
+  var op:String? { return "/" }
+  var prefix:String { return "/" }
+  var joiner:String { return "/" }
+}
+
+/// RFC6570 (3.2.7) Path-Style Parameter Expansion: {;var}
+class PathStyleParameterExpansion : BaseOperator, Operator {
+  var op:String? { return ";" }
+  var prefix:String { return ";" }
+  var joiner:String { return ";" }
+
+  override func expand(variable:String, value:String?) -> String {
+    if let value = value {
+      if countElements(value) > 0 {
+        return "\(variable)=\(value)"
+      }
+    }
+
+    return "\(variable)"
+  }
+}
+
+/// RFC6570 (3.2.8) Form-Style Query Expansion: {?var}
+class FormStyleQueryExpansion : BaseOperator, Operator {
+  var op:String? { return "?" }
+  var prefix:String { return "?" }
+  var joiner:String { return "&" }
+
+  override func expand(variable:String, value:String?) -> String {
+    if let value = value {
+      return "\(variable)=\(value)"
+    }
+
+    return ""
+  }
+}
+
+/// RFC6570 (3.2.9) Form-Style Query Continuation: {&var}
+class FormStyleQueryContinuation : BaseOperator, Operator {
+  var op:String? { return "&" }
+  var prefix:String { return "&" }
+  var joiner:String { return "&" }
+
+  override func expand(variable:String, value:String?) -> String {
+    if let value = value {
+      return "\(variable)=\(value)"
+    }
+
+    return ""
+  }
 }
