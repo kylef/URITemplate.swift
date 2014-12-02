@@ -66,4 +66,10 @@ class URITemplateExpansionTests: XCTestCase {
     let expanded = template.expand(["names": ["Kyle", "Katie"]])
     XCTAssertEqual(expanded, "Kyle,Katie")
   }
+
+    func testExplodedArrayJoiningExpansion() {
+        let template = URITemplate(template:"{.names*}")
+        let expanded = template.expand(["names": ["Kyle", "Maxine"]])
+        XCTAssertEqual(expanded, ".Kyle.Maxine")
+    }
 }

@@ -115,12 +115,19 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
         expression = expression.substringToIndex(range.startIndex)
       }
 
-      return op!.prefix + op!.joiner.join(expression.componentsSeparatedByString(",").map { variable -> String in
-        if let value:AnyObject = variables[variable] {
-          return op!.expand(variable, value: value, prefix:prefix)
+      return op!.prefix + op!.joiner.join(expression.componentsSeparatedByString(",").map { vari -> String in
+        var variable = vari
+        let explode = variable.hasSuffix("*")
+
+        if explode {
+          variable = variable.substringToIndex(variable.endIndex.predecessor())
         }
 
-        return op!.expand(variable, value:nil, prefix:prefix)
+        if let value:AnyObject = variables[variable] {
+          return op!.expand(variable, value: value, explode: explode, prefix:prefix)
+        }
+
+        return op!.expand(variable, value:nil, explode:false, prefix:prefix)
       })
     }
   }
@@ -208,15 +215,18 @@ protocol Operator {
   /// Character to use to join expanded components
   var joiner:String { get }
 
-  func expand(variable:String, value:AnyObject?, prefix:Int?) -> String
+  func expand(variable:String, value:AnyObject?, explode:Bool, prefix:Int?) -> String
 }
 
 class BaseOperator {
-  func expand(variable:String, value:AnyObject?, prefix:Int?) -> String {
+  var joiner:String { return "," }
+
+  func expand(variable:String, value:AnyObject?, explode:Bool, prefix:Int?) -> String {
     if var value:AnyObject = value {
       var expandedValue:String!
       if let values = value as? [AnyObject] {
-        expandedValue = ",".join(values.map { self.expand(value: "\($0)") })
+        let joiner = explode ? self.joiner : ","
+        expandedValue = joiner.join(values.map { self.expand(value: "\($0)") })
       } else {
         expandedValue = expand(value: "\(value)")
       }
@@ -243,7 +253,7 @@ class BaseOperator {
 class StringExpansion : BaseOperator, Operator {
   var op:String? { return nil }
   var prefix:String { return "" }
-  var joiner:String { return "," }
+  override var joiner:String { return "," }
 
   override func expand(# value:String) -> String {
     return value.percentEncoded()
@@ -254,7 +264,7 @@ class StringExpansion : BaseOperator, Operator {
 class ReservedExpansion : BaseOperator, Operator {
   var op:String? { return "+" }
   var prefix:String { return "" }
-  var joiner:String { return "," }
+  override var joiner:String { return "," }
 
   override func expand(# value:String) -> String {
     return value.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
@@ -265,7 +275,7 @@ class ReservedExpansion : BaseOperator, Operator {
 class FragmentExpansion : BaseOperator, Operator {
   var op:String? { return "#" }
   var prefix:String { return "#" }
-  var joiner:String { return "," }
+  override var joiner:String { return "," }
 
   override func expand(# value:String) -> String {
     return value.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
@@ -276,23 +286,23 @@ class FragmentExpansion : BaseOperator, Operator {
 class LabelExpansion : BaseOperator, Operator {
   var op:String? { return "." }
   var prefix:String { return "." }
-  var joiner:String { return "." }
+  override var joiner:String { return "." }
 }
 
 /// RFC6570 (3.2.6) Path Segment Expansion: {/var}
 class PathSegmentExpansion : BaseOperator, Operator {
   var op:String? { return "/" }
   var prefix:String { return "/" }
-  var joiner:String { return "/" }
+  override var joiner:String { return "/" }
 }
 
 /// RFC6570 (3.2.7) Path-Style Parameter Expansion: {;var}
 class PathStyleParameterExpansion : BaseOperator, Operator {
   var op:String? { return ";" }
   var prefix:String { return ";" }
-  var joiner:String { return ";" }
+  override var joiner:String { return ";" }
 
-  override func expand(variable:String, value:AnyObject?, prefix:Int?) -> String {
+  override func expand(variable:String, value:AnyObject?, explode:Bool, prefix:Int?) -> String {
     if let value:AnyObject = value {
       let value = "\(value)"
       if countElements(value) > 0 {
@@ -308,9 +318,9 @@ class PathStyleParameterExpansion : BaseOperator, Operator {
 class FormStyleQueryExpansion : BaseOperator, Operator {
   var op:String? { return "?" }
   var prefix:String { return "?" }
-  var joiner:String { return "&" }
+  override var joiner:String { return "&" }
 
-  override func expand(variable:String, value:AnyObject?, prefix:Int?) -> String {
+  override func expand(variable:String, value:AnyObject?, explode:Bool, prefix:Int?) -> String {
     if let value:AnyObject = value {
       return "\(variable)=\(value)"
     }
@@ -323,9 +333,9 @@ class FormStyleQueryExpansion : BaseOperator, Operator {
 class FormStyleQueryContinuation : BaseOperator, Operator {
   var op:String? { return "&" }
   var prefix:String { return "&" }
-  var joiner:String { return "&" }
+  override var joiner:String { return "&" }
 
-  override func expand(variable:String, value:AnyObject?, prefix:Int?) -> String {
+  override func expand(variable:String, value:AnyObject?, explode:Bool, prefix:Int?) -> String {
     if let value:AnyObject = value {
       return "\(variable)=\(value)"
     }
