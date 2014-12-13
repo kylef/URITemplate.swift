@@ -224,7 +224,15 @@ class BaseOperator {
   func expand(variable:String, value:AnyObject?, explode:Bool, prefix:Int?) -> String {
     if var value:AnyObject = value {
       var expandedValue:String!
-      if let values = value as? [AnyObject] {
+      if let values = value as? [String:AnyObject] {
+        let joiner = explode ? self.joiner : ","
+        let keyValueJoiner = explode ? "=" : ","
+        let elements = map(values, { (key, value) -> String in
+          let expandValue = self.expand(value: "\(value)")
+          return "\(key)\(keyValueJoiner)\(expandValue)"
+        })
+        expandedValue = join(joiner, elements)
+      } else if let values = value as? [AnyObject] {
         let joiner = explode ? self.joiner : ","
         expandedValue = joiner.join(values.map { self.expand(value: "\($0)") })
       } else {
@@ -287,6 +295,10 @@ class LabelExpansion : BaseOperator, Operator {
   var op:String? { return "." }
   var prefix:String { return "." }
   override var joiner:String { return "." }
+
+  override func expand(# value:String) -> String {
+    return value.percentEncoded()
+  }
 }
 
 /// RFC6570 (3.2.6) Path Segment Expansion: {/var}
@@ -294,6 +306,10 @@ class PathSegmentExpansion : BaseOperator, Operator {
   var op:String? { return "/" }
   var prefix:String { return "/" }
   override var joiner:String { return "/" }
+
+  override func expand(# value:String) -> String {
+    return value.percentEncoded()
+  }
 }
 
 /// RFC6570 (3.2.7) Path-Style Parameter Expansion: {;var}
