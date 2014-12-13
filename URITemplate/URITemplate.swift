@@ -224,33 +224,25 @@ class BaseOperator {
 
   func expand(variable:String, value:AnyObject?, explode:Bool, prefix:Int?) -> String {
     if var value:AnyObject = value {
-      var expandedValue:String!
       if let values = value as? [String:AnyObject] {
-        let joiner = explode ? self.joiner : ","
-        let keyValueJoiner = explode ? "=" : ","
-        let elements = map(values, { (key, value) -> String in
-          let expandValue = self.expand(value: "\(value)")
-          return "\(key)\(keyValueJoiner)\(expandValue)"
-        })
-        expandedValue = join(joiner, elements)
+        return expand(variable:variable, value: values, explode: explode)
       } else if let values = value as? [AnyObject] {
-        let joiner = explode ? self.joiner : ","
-        expandedValue = joiner.join(values.map { self.expand(value: "\($0)") })
+        return expand(variable:variable, value: values, explode: explode)
       } else {
-        expandedValue = expand(value:"\(value)", prefix:prefix)
+        return expand(variable:variable, value:"\(value)", prefix:prefix)
       }
-
-      return expandedValue
     }
 
-    return ""
+    return expand(variable:variable)
   }
 
+  // Point to overide to expand a value (i.e, perform encoding)
   func expand(# value:String) -> String {
     return value
   }
 
-  func expand(# value:String, prefix:Int?) -> String {
+  // Point to overide to expanding a string
+  func expand(# variable:String, value:String, prefix:Int?) -> String {
     if let prefix = prefix {
       if countElements(value) > prefix {
         let index = advance(value.startIndex, prefix)
@@ -259,6 +251,28 @@ class BaseOperator {
     }
 
     return expand(value: value)
+  }
+
+  // Point to overide to expanding an array
+  func expand(# variable:String, value:[AnyObject], explode:Bool) -> String {
+    let joiner = explode ? self.joiner : ","
+    return joiner.join(value.map { self.expand(value: "\($0)") })
+  }
+
+  // Point to overide to expanding a dictionary
+  func expand(# variable:String, value:[String:AnyObject], explode:Bool) -> String {
+    let joiner = explode ? self.joiner : ","
+    let keyValueJoiner = explode ? "=" : ","
+    let elements = map(value, { (key, value) -> String in
+      let expandValue = self.expand(value: "\(value)")
+      return "\(key)\(keyValueJoiner)\(expandValue)"
+    })
+    return join(joiner, elements)
+  }
+
+  // Point to overide when value not found
+  func expand(# variable:String) -> String {
+    return ""
   }
 }
 
@@ -323,16 +337,17 @@ class PathStyleParameterExpansion : BaseOperator, Operator {
   var prefix:String { return ";" }
   override var joiner:String { return ";" }
 
-  override func expand(variable:String, value:AnyObject?, explode:Bool, prefix:Int?) -> String {
-    if let value:AnyObject = value {
-      let value = "\(value)"
-      if countElements(value) > 0 {
-        let expandedValue = expand(value:value, prefix:prefix)
-        return "\(variable)=\(expandedValue)"
-      }
+  override func expand(# variable:String) -> String {
+    return variable
+  }
+
+  override func expand(# variable:String, value:String, prefix:Int?) -> String {
+    if countElements(value) > 0 {
+      let expandedValue = super.expand(variable: variable, value: value, prefix: prefix)
+      return "\(variable)=\(expandedValue)"
     }
 
-    return "\(variable)"
+    return variable
   }
 }
 
@@ -342,13 +357,9 @@ class FormStyleQueryExpansion : BaseOperator, Operator {
   var prefix:String { return "?" }
   override var joiner:String { return "&" }
 
-  override func expand(variable:String, value:AnyObject?, explode:Bool, prefix:Int?) -> String {
-    if let value:AnyObject = value {
-      let expandedValue = expand(value:"\(value)", prefix:prefix)
-      return "\(variable)=\(expandedValue)"
-    }
-
-    return ""
+  override func expand(# variable:String, value:String, prefix:Int?) -> String {
+    let expandedValue = super.expand(variable: variable, value: value, prefix: prefix)
+    return "\(variable)=\(expandedValue)"
   }
 }
 
@@ -358,12 +369,8 @@ class FormStyleQueryContinuation : BaseOperator, Operator {
   var prefix:String { return "&" }
   override var joiner:String { return "&" }
 
-  override func expand(variable:String, value:AnyObject?, explode:Bool, prefix:Int?) -> String {
-    if let value:AnyObject = value {
-      let expandedValue = expand(value:"\(value)", prefix:prefix)
-      return "\(variable)=\(expandedValue)"
-    }
-
-    return ""
+  override func expand(# variable:String, value:String, prefix:Int?) -> String {
+    let expandedValue = super.expand(variable: variable, value: value, prefix: prefix)
+    return "\(variable)=\(expandedValue)"
   }
 }
