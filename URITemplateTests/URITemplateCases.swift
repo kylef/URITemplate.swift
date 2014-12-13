@@ -37,13 +37,13 @@ func testExtraction(suite:Suite, testcase:Case) {
 
 @objc class URITemplateCasesTests : XCTestCase {
   let files = [
-    "extended-tests",
+//    "extended-tests",
 //    "negative-tests",
     "spec-examples-by-section",
     "spec-examples"
   ]
 
-  let supportedExpansionLevel = 3
+  let supportedExpansionLevel = 4
   let supportedExtractionLevel = 2
 
   override class func testInvocations() -> [AnyObject] {

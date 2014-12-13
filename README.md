@@ -38,7 +38,7 @@ The different functions inside URITemplate support different levels of RFC6570. 
 | Component   | Compliance     |
 |:-----------:|:--------------:|
 | `variables` | Full (Level 4) |
-| `expand`    | Level 3        |
+| `expand`    | Full (Level 4) |
 | `extract`   | Level 2        |
 
 ## License
