@@ -435,8 +435,41 @@ class FormStyleQueryContinuation : BaseOperator, Operator {
   var prefix:String { return "&" }
   override var joiner:String { return "&" }
 
+  override func expand(# value:String) -> String {
+    return value.percentEncoded()
+  }
+
   override func expand(# variable:String, value:String, prefix:Int?) -> String {
     let expandedValue = super.expand(variable: variable, value: value, prefix: prefix)
     return "\(variable)=\(expandedValue)"
+  }
+
+  override func expand(# variable:String, value:[AnyObject], explode:Bool) -> String {
+    let joiner = explode ? self.joiner : ","
+    let expandedValue = joiner.join(value.map {
+      let expandedValue = self.expand(value: "\($0)")
+
+      if explode {
+        return "\(variable)=\(expandedValue)"
+      }
+
+      return expandedValue
+      })
+
+    if !explode {
+      return "\(variable)=\(expandedValue)"
+    }
+
+    return expandedValue
+  }
+
+  override func expand(# variable:String, value:[String:AnyObject], explode:Bool) -> String {
+    let expandedValue = super.expand(variable: variable, value: value, explode: explode)
+
+    if (!explode) {
+      return "\(variable)=\(expandedValue)"
+    }
+
+    return expandedValue
   }
 }
