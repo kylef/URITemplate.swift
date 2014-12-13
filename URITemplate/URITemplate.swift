@@ -237,14 +237,7 @@ class BaseOperator {
         let joiner = explode ? self.joiner : ","
         expandedValue = joiner.join(values.map { self.expand(value: "\($0)") })
       } else {
-        expandedValue = expand(value: "\(value)")
-      }
-
-      if let prefix = prefix {
-        if countElements(expandedValue) > prefix {
-          let index = advance(expandedValue.startIndex, prefix)
-          return expandedValue.substringToIndex(index)
-        }
+        expandedValue = expand(value:"\(value)", prefix:prefix)
       }
 
       return expandedValue
@@ -255,6 +248,17 @@ class BaseOperator {
 
   func expand(# value:String) -> String {
     return value
+  }
+
+  func expand(# value:String, prefix:Int?) -> String {
+    if let prefix = prefix {
+      if countElements(value) > prefix {
+        let index = advance(value.startIndex, prefix)
+        return expand(value: value.substringToIndex(index))
+      }
+    }
+
+    return expand(value: value)
   }
 }
 
@@ -323,7 +327,8 @@ class PathStyleParameterExpansion : BaseOperator, Operator {
     if let value:AnyObject = value {
       let value = "\(value)"
       if countElements(value) > 0 {
-        return "\(variable)=\(value)"
+        let expandedValue = expand(value:value, prefix:prefix)
+        return "\(variable)=\(expandedValue)"
       }
     }
 
@@ -339,7 +344,8 @@ class FormStyleQueryExpansion : BaseOperator, Operator {
 
   override func expand(variable:String, value:AnyObject?, explode:Bool, prefix:Int?) -> String {
     if let value:AnyObject = value {
-      return "\(variable)=\(value)"
+      let expandedValue = expand(value:"\(value)", prefix:prefix)
+      return "\(variable)=\(expandedValue)"
     }
 
     return ""
@@ -354,7 +360,8 @@ class FormStyleQueryContinuation : BaseOperator, Operator {
 
   override func expand(variable:String, value:AnyObject?, explode:Bool, prefix:Int?) -> String {
     if let value:AnyObject = value {
-      return "\(variable)=\(value)"
+      let expandedValue = expand(value:"\(value)", prefix:prefix)
+      return "\(variable)=\(expandedValue)"
     }
 
     return ""
