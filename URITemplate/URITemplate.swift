@@ -92,7 +92,6 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
   /// Expand template as a URI Template using the given variables
   public func expand(variables:[String:AnyObject]) -> String {
     return regex.substitute(template) { string in
-      var prefix:Int?
       var expression = string.substringWithRange(string.startIndex.successor()..<string.endIndex.predecessor())
       let firstCharacter = expression.substringToIndex(expression.startIndex.successor())
 
@@ -110,13 +109,15 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
         op = self.operators.first
       }
 
-      if let range = expression.rangeOfString(":") {
-        prefix = expression.substringFromIndex(range.endIndex).toInt()
-        expression = expression.substringToIndex(range.startIndex)
-      }
-
       return op!.prefix + op!.joiner.join(expression.componentsSeparatedByString(",").map { vari -> String in
         var variable = vari
+        var prefix:Int?
+
+        if let range = variable.rangeOfString(":") {
+          prefix = variable.substringFromIndex(range.endIndex).toInt()
+          variable = variable.substringToIndex(range.startIndex)
+        }
+
         let explode = variable.hasSuffix("*")
 
         if explode {
