@@ -32,6 +32,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2761AB841A42478200093A2F /* UniversalFramework_Base.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = UniversalFramework_Base.xcconfig; sourceTree = "<group>"; };
+		2761AB851A42478200093A2F /* UniversalFramework_Framework.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = UniversalFramework_Framework.xcconfig; sourceTree = "<group>"; };
+		2761AB861A42478200093A2F /* UniversalFramework_Test.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = UniversalFramework_Test.xcconfig; sourceTree = "<group>"; };
 		77356D801A253325002822CF /* URITemplate.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = URITemplate.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		77356D841A253325002822CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		77356D851A253325002822CF /* URITemplate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = URITemplate.h; sourceTree = "<group>"; };
@@ -68,11 +71,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2761AB831A42478200093A2F /* Configurations */ = {
+			isa = PBXGroup;
+			children = (
+				2761AB841A42478200093A2F /* UniversalFramework_Base.xcconfig */,
+				2761AB851A42478200093A2F /* UniversalFramework_Framework.xcconfig */,
+				2761AB861A42478200093A2F /* UniversalFramework_Test.xcconfig */,
+			);
+			path = Configurations;
+			sourceTree = "<group>";
+		};
 		77356D761A253325002822CF = {
 			isa = PBXGroup;
 			children = (
 				77356D821A253325002822CF /* URITemplate */,
 				77356D8F1A253325002822CF /* URITemplateTests */,
+				2761AB831A42478200093A2F /* Configurations */,
 				77356D811A253325002822CF /* Products */,
 			);
 			indentWidth = 2;
@@ -311,7 +325,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -350,7 +364,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -360,6 +374,7 @@
 		};
 		77356D971A253325002822CF /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2761AB851A42478200093A2F /* UniversalFramework_Framework.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -379,6 +394,7 @@
 		};
 		77356D981A253325002822CF /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2761AB851A42478200093A2F /* UniversalFramework_Framework.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -397,12 +413,9 @@
 		};
 		77356D9A1A253325002822CF /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2761AB861A42478200093A2F /* UniversalFramework_Test.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					"$(inherited)",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -415,12 +428,9 @@
 		};
 		77356D9B1A253325002822CF /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2761AB861A42478200093A2F /* UniversalFramework_Test.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					"$(inherited)",
-				);
 				INFOPLIST_FILE = URITemplateTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
