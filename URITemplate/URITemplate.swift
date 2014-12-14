@@ -280,9 +280,11 @@ class BaseOperator {
     let joiner = explode ? self.joiner : ","
     let keyValueJoiner = explode ? "=" : ","
     let elements = map(value, { (key, value) -> String in
-      let expandValue = self.expand(value: "\(value)")
-      return "\(key)\(keyValueJoiner)\(expandValue)"
+      let expandedKey = self.expand(value: key)
+      let expandedValue = self.expand(value: "\(value)")
+      return "\(expandedKey)\(keyValueJoiner)\(expandedValue)"
     })
+
     return join(joiner, elements)
   }
 
@@ -353,6 +355,14 @@ class PathSegmentExpansion : BaseOperator, Operator {
   override func expand(# value:String) -> String {
     return value.percentEncoded()
   }
+
+  override func expand(# variable:String, value:[AnyObject], explode:Bool) -> String? {
+    if countElements(value) > 0 {
+      return super.expand(variable: variable, value: value, explode: explode)
+    }
+
+    return nil
+  }
 }
 
 /// RFC6570 (3.2.7) Path-Style Parameter Expansion: {;var}
@@ -422,34 +432,43 @@ class FormStyleQueryExpansion : BaseOperator, Operator {
   }
 
   override func expand(# variable:String, value:[AnyObject], explode:Bool) -> String? {
-    let joiner = explode ? self.joiner : ","
-    let expandedValue = joiner.join(value.map {
-      let expandedValue = self.expand(value: "\($0)")
+    if countElements(value) > 0 {
+      let joiner = explode ? self.joiner : ","
+      let expandedValue = joiner.join(value.map {
+        let expandedValue = self.expand(value: "\($0)")
 
-      if explode {
+        if explode {
+          return "\(variable)=\(expandedValue)"
+        }
+
+        return expandedValue
+      })
+
+      if !explode {
         return "\(variable)=\(expandedValue)"
       }
 
       return expandedValue
-      })
-
-    if !explode {
-      return "\(variable)=\(expandedValue)"
     }
 
-    return expandedValue
+    return nil
   }
 
   override func expand(# variable:String, value:[String:AnyObject], explode:Bool) -> String? {
-    let expandedValue = super.expand(variable: variable, value: value, explode: explode)
+    if countElements(value) > 0 {
+      let expandedVariable = self.expand(value: variable)
+      let expandedValue = super.expand(variable: variable, value: value, explode: explode)
 
-    if let expandedValue = expandedValue {
-      if (!explode) {
-        return "\(variable)=\(expandedValue)"
+      if let expandedValue = expandedValue {
+        if (!explode) {
+          return "\(expandedVariable)=\(expandedValue)"
+        }
       }
+
+      return expandedValue
     }
 
-    return expandedValue
+    return nil
   }
 }
 

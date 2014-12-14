@@ -37,8 +37,7 @@ func testExtraction(suite:Suite, testcase:Case) {
 
 @objc class URITemplateCasesTests : XCTestCase {
   let files = [
-//    "extended-tests",
-//    "negative-tests",
+    "extended-tests",
     "spec-examples-by-section",
     "spec-examples"
   ]
