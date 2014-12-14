@@ -149,9 +149,23 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
 
   /// Extract the variables used in a given URL
   public func extract(url:String) -> Dictionary<String, String> {
+    var variables = [String]()
     let regex = NSRegularExpression(pattern: "(\\{([^\\}]+)\\})|[^(.*)]", options: NSRegularExpressionOptions(0), error: nil)!
     let pattern = regex.substitute(self.template) { expression in
       if expression.hasPrefix("{") && expression.hasSuffix("}") {
+        var startIndex = expression.startIndex.successor()
+
+        for op in self.operators {
+          if let op = op.op {
+            if expression.hasPrefix("{\(op)") {
+              startIndex = startIndex.successor()
+              break
+            }
+          }
+        }
+
+        let endIndex = expression.endIndex.predecessor()
+        variables.insert(expression.substringWithRange(startIndex..<endIndex), atIndex:0)
         return "(.*)"
       } else {
         return NSRegularExpression.escapedPatternForString(expression)
@@ -161,16 +175,21 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
     let expression = NSRegularExpression(pattern: "^\(pattern)$", options: NSRegularExpressionOptions(0), error: nil)
     if let expression = expression {
       let matches = expression.matches(url)
+      let input = url as NSString
+      let range = NSRange(location: 0, length: input.length)
+      let results = expression.matchesInString(input, options: NSMatchingOptions(0), range: range)
 
-      var extractedVariables = Dictionary<String, String>()
+      if let result = results.first as? NSTextCheckingResult {
+        var extractedVariables = Dictionary<String, String>()
 
-      if matches.count == variables.count {
-        for index in 0..<matches.count {
-          extractedVariables[variables[index]] = matches[index].stringByRemovingPercentEncoding
+        for (index, variable) in enumerate(variables) {
+          let range = result.rangeAtIndex(index + 1)
+          let value = input.substringWithRange(range).stringByRemovingPercentEncoding
+          extractedVariables[variable] = value
         }
-      }
 
-      return extractedVariables
+        return extractedVariables
+      }
     }
 
     return [:]

@@ -18,7 +18,7 @@ let url = template.expand(["owner": "kylef", "repo": "URITemplate.swift"])
 ### Determine which variables are in a template
 
 ```swift
-let variables = template.variables()
+let variables = template.variables
 => ["owner", "repo"]
 ```
 

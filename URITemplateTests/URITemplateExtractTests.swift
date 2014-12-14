@@ -17,4 +17,9 @@ class URITemplateExtractTests: XCTestCase {
 
     XCTAssertEqual(values, ["variable": "value"])
   }
+
+  func testHandlesCompositeValues() {
+    let template = URITemplate(template:"https://api.github.com/repos/{owner}/{repo}/")
+    XCTAssertEqual(template.extract("https://api.github.com/repos/kylef/PathKit/") as [String:String], ["owner":"kylef", "repo":"PathKit"])
+  }
 }

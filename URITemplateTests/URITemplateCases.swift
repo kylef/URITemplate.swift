@@ -27,7 +27,7 @@ func testExtraction(suite:Suite, testcase:Case) {
       if let value:AnyObject = variables[variable] as AnyObject? {
         expectedVariables[variable] = "\(value)"
       } else {
-        XCTAssert(false, "Missing Variable \(variable)")
+        XCTAssert(false, "Missing Variable \(variable) from `\(uri)` with template `\(template)`")
       }
     }
 
