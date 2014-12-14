@@ -33,13 +33,9 @@ let variables = template.extract("https://api.github.com/repos/kylef/PathKit/")
 
 The URITemplate library follows the [test suite](https://github.com/uri-templates/uritemplate-test).
 
-The different functions inside URITemplate support different levels of RFC6570. Full level 4 support across all functions is desired and currently work in progress
+We have full support for level 4 of RFC6570 when expanding a template and retrieving the variables in a template.
 
-| Component   | Compliance     |
-|:-----------:|:--------------:|
-| `variables` | Full (Level 4) |
-| `expand`    | Full (Level 4) |
-| `extract`   | Level 2        |
+For extraction of variables from an already expanded template, level 3 is supported.
 
 ## License
 
