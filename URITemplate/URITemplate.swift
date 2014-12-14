@@ -165,8 +165,14 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
         }
 
         let endIndex = expression.endIndex.predecessor()
-        variables.insert(expression.substringWithRange(startIndex..<endIndex), atIndex:0)
-        return "(.*)"
+        let expression = expression.substringWithRange(startIndex..<endIndex)
+
+        let regexes = expression.componentsSeparatedByString(",").map { variable -> String in
+          variables.insert(variable, atIndex:0)
+          return "(.*)"
+        }
+
+        return join("", regexes)
       } else {
         return NSRegularExpression.escapedPatternForString(expression)
       }
