@@ -10,7 +10,32 @@ import Foundation
 import XCTest
 import URITemplate
 
-class URITemplateCasesTests : XCTestCase {
+// MARK: Tests
+
+func testExpansion(suite:Suite, testcase:Case) {
+  let expanded = testcase.uriTemplate.expand(suite.variables)
+  XCTAssertTrue(contains(testcase.expected, expanded), "\(testcase.template). \(testcase.expected[0]) !~ \(expanded)")
+}
+
+func testExtraction(suite:Suite, testcase:Case) {
+  let template = testcase.uriTemplate
+
+  for uri in testcase.expected {
+    let variables = template.extract(uri)
+    var expectedVariables = Dictionary<String, String>()
+    for variable in template.variables {
+      if let value:AnyObject = variables[variable] as AnyObject? {
+        expectedVariables[variable] = "\(value)"
+      } else {
+        XCTAssert(false, "Missing Variable \(variable)")
+      }
+    }
+
+    XCTAssertEqual(variables as NSDictionary, expectedVariables as NSDictionary, "\(template)")
+  }
+}
+
+@objc class URITemplateCasesTests : XCTestCase {
   let files = [
     "extended-tests",
 //    "negative-tests",
@@ -21,48 +46,56 @@ class URITemplateCasesTests : XCTestCase {
   let supportedExpansionLevel = 3
   let supportedExtractionLevel = 2
 
-  func testExpansion() {
-    for suite in suites(supportedExpansionLevel) {
-      for testcase in suite.cases {
-        let expanded = testcase.uriTemplate.expand(suite.variables)
-        XCTAssertTrue(contains(testcase.expected, expanded), "\(testcase.template). \(testcase.expected[0]) !~ \(expanded)")
-      }
-    }
-  }
+  override class func testInvocations() -> [AnyObject] {
+    let tests = URITemplateCasesTests()
+    var invocations = [AnyObject]()
 
-  func testExtraction() {
-    for suite in suites(supportedExtractionLevel) {
-      for testcase in suite.cases {
-        let template = testcase.uriTemplate
+    for suite in tests.suites() {
+      for (index, testcase) in enumerate(suite.cases) {
+        if tests.supportedExpansionLevel >= suite.level {
+          invocations.append(addTest("\(suite.name) Case \(index) Expansion") {
+            testExpansion(suite, testcase)
+          })
+        }
 
-        for uri in testcase.expected {
-          let variables = template.extract(uri)
-          var expectedVariables = Dictionary<String, String>()
-          for variable in template.variables {
-            if let value:AnyObject = variables[variable] as AnyObject? {
-              expectedVariables[variable] = "\(value)"
-            } else {
-              XCTAssert(false, "Missing Variable \(variable)")
-            }
-          }
-
-          XCTAssertEqual(variables as NSDictionary, expectedVariables as NSDictionary, "\(template)")
+        if tests.supportedExtractionLevel >= suite.level {
+          invocations.append(addTest("\(suite.name) Case \(index) Extraction") {
+            testExtraction(suite, testcase)
+          })
         }
       }
     }
+
+    return invocations
   }
+
+  class func addTest(name:String, closure:() -> ()) -> AnyObject {
+    let block : @objc_block (AnyObject!) -> () = { (instance : AnyObject!) -> () in
+      closure()
+    }
+
+    let imp = imp_implementationWithBlock(unsafeBitCast(block, AnyObject.self))
+    let selectorName = name.stringByReplacingOccurrencesOfString(" ", withString: "_", options: NSStringCompareOptions(0), range: nil)
+    let selector = Selector(selectorName)
+    let method = class_getInstanceMethod(self, "example") // No @encode in swift, creating a dummy method to get encoding
+    let types = method_getTypeEncoding(method)
+    let added = class_addMethod(self, selector, imp, types)
+    assert(added, "Failed to add `\(name)` as `\(selector)`")
+
+    return self.testCaseWithSelector(selector).invocation
+  }
+
+  func example() { /* See addTest() */ }
 
   // MARK:
 
-  func suites(level:Int) -> [Suite] {
+  func suites() -> [Suite] {
     let bundle = NSBundle(forClass:object_getClass(self))
     let urls = files.map { file -> NSURL in
       bundle.URLForResource(file, withExtension: "json")!
     }
 
-    return loadSuites(urls).filter { suite in
-      level >= suite.level
-    }
+    return loadSuites(urls)
   }
 }
 
@@ -128,4 +161,3 @@ func loadSuites(urls:[NSURL]) -> [Suite] {
 
   return suites
 }
-
