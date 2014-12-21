@@ -12,7 +12,7 @@ import Foundation
 
 /// A data structure to represent an RFC6570 URI template.
 public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvertible, ExtendedGraphemeClusterLiteralConvertible, UnicodeScalarLiteralConvertible {
-  let template:String
+  public let template:String
 
   var regex:NSRegularExpression {
     var error:NSError?

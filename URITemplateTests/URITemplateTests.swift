@@ -11,6 +11,13 @@ import XCTest
 import URITemplate
 
 class URITemplateTests: XCTestCase {
+  // MARK: Template
+
+  func testTemplate() {
+    let uri = URITemplate(template:"{scheme}://{hostname}/")
+    XCTAssertEqual(uri.template, "{scheme}://{hostname}/")
+  }
+
   // MARK: Printable
 
   func testPrintable() {
