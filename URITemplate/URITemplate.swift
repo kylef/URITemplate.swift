@@ -148,7 +148,7 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
   }
 
   /// Extract the variables used in a given URL
-  public func extract(url:String) -> Dictionary<String, String> {
+  public func extract(url:String) -> [String:String]? {
     var variables = [String]()
     let regex = NSRegularExpression(pattern: "(\\{([^\\}]+)\\})|[^(.*)]", options: NSRegularExpressionOptions(0), error: nil)!
     let pattern = regex.substitute(self.template) { expression in
@@ -198,7 +198,7 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
       }
     }
 
-    return [:]
+    return nil
   }
 }
 

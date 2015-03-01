@@ -22,16 +22,20 @@ func testExtraction(suite:Suite, testcase:Case) {
 
   for uri in testcase.expected {
     let variables = template.extract(uri)
-    var expectedVariables = Dictionary<String, String>()
-    for variable in template.variables {
-      if let value:AnyObject = variables[variable] as AnyObject? {
-        expectedVariables[variable] = "\(value)"
-      } else {
-        XCTAssert(false, "Missing Variable \(variable) from `\(uri)` with template `\(template)`")
+    if let variables = template.extract(uri) {
+      var expectedVariables = Dictionary<String, String>()
+      for variable in template.variables {
+        if let value:AnyObject = variables[variable] as AnyObject? {
+          expectedVariables[variable] = "\(value)"
+        } else {
+          XCTAssert(false, "Missing Variable \(variable) from `\(uri)` with template `\(template)`")
+        }
       }
-    }
 
-    XCTAssertEqual(variables as NSDictionary, expectedVariables as NSDictionary, "\(template)")
+      XCTAssertEqual(variables as NSDictionary, expectedVariables as NSDictionary, "\(template)")
+    } else {
+      XCTFail("Extracted no match")
+    }
   }
 }
 
