@@ -108,7 +108,7 @@ struct Suite {
   let name:String
   let variables:Dictionary<String, AnyObject>
   let cases:[Case]
-  var level:Int
+  let level:Int
 
   init(name:String, testSuite:Dictionary<String, AnyObject>) {
     self.name = name
@@ -116,9 +116,10 @@ struct Suite {
     let testcases = testSuite["testcases"] as! [[AnyObject]]
     cases = testcases.map { Case(object:$0) }
 
-    level = 4
     if let testLevel = testSuite["level"] as? Int {
       level = testLevel
+    } else {
+      level = 4
     }
   }
 }
