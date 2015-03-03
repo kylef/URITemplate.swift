@@ -86,7 +86,7 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
           return component
         }
       }
-    }.reduce([], +)
+    }.reduce([], combine: +)
   }
 
   /// Expand template as a URI Template using the given variables
@@ -139,7 +139,7 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
         return accumulator
       })
 
-      if countElements(expansions) > 0 {
+      if count(expansions) > 0 {
         return op!.prefix + op!.joiner.join(expansions)
       }
 
@@ -183,7 +183,7 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
       let matches = expression.matches(url)
       let input = url as NSString
       let range = NSRange(location: 0, length: input.length)
-      let results = expression.matchesInString(input, options: NSMatchingOptions(0), range: range)
+      let results = expression.matchesInString(url, options: NSMatchingOptions(0), range: range)
 
       if let result = results.first as? NSTextCheckingResult {
         var extractedVariables = Dictionary<String, String>()
@@ -221,16 +221,16 @@ extension NSRegularExpression {
       newString = newString.stringByReplacingCharactersInRange(match.range, withString: replacement)
     }
 
-    return newString
+    return newString as String
   }
 
   func matches(string:String) -> [String] {
     let input = string as NSString
     let range = NSRange(location: 0, length: input.length)
-    let results = matchesInString(input, options: NSMatchingOptions(0), range: range)
+    let results = matchesInString(string, options: NSMatchingOptions(0), range: range)
 
     return results.map { result -> String in
-      let checkingResult = result as NSTextCheckingResult
+      let checkingResult = result as! NSTextCheckingResult
       var range = checkingResult.range
       return input.substringWithRange(range)
     }
@@ -239,7 +239,7 @@ extension NSRegularExpression {
 
 extension String {
   func percentEncoded() -> String {
-    return CFURLCreateStringByAddingPercentEscapes(nil, self, nil, ":/?&=;+!@#$()',*", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding))
+    return CFURLCreateStringByAddingPercentEscapes(nil, self, nil, ":/?&=;+!@#$()',*", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding)) as String
   }
 }
 
@@ -285,7 +285,7 @@ class BaseOperator {
   // Point to overide to expanding a string
   func expand(# variable:String, value:String, prefix:Int?) -> String {
     if let prefix = prefix {
-      if countElements(value) > prefix {
+      if count(value) > prefix {
         let index = advance(value.startIndex, prefix)
         return expand(value: value.substringToIndex(index))
       }
@@ -363,7 +363,7 @@ class LabelExpansion : BaseOperator, Operator {
   }
 
   override func expand(# variable:String, value:[AnyObject], explode:Bool) -> String? {
-    if countElements(value) > 0 {
+    if count(value) > 0 {
       return super.expand(variable: variable, value: value, explode: explode)
     }
 
@@ -382,7 +382,7 @@ class PathSegmentExpansion : BaseOperator, Operator {
   }
 
   override func expand(# variable:String, value:[AnyObject], explode:Bool) -> String? {
-    if countElements(value) > 0 {
+    if count(value) > 0 {
       return super.expand(variable: variable, value: value, explode: explode)
     }
 
@@ -401,7 +401,7 @@ class PathStyleParameterExpansion : BaseOperator, Operator {
   }
 
   override func expand(# variable:String, value:String, prefix:Int?) -> String {
-    if countElements(value) > 0 {
+    if count(value) > 0 {
       let expandedValue = super.expand(variable: variable, value: value, prefix: prefix)
       return "\(variable)=\(expandedValue)"
     }
@@ -457,7 +457,7 @@ class FormStyleQueryExpansion : BaseOperator, Operator {
   }
 
   override func expand(# variable:String, value:[AnyObject], explode:Bool) -> String? {
-    if countElements(value) > 0 {
+    if count(value) > 0 {
       let joiner = explode ? self.joiner : ","
       let expandedValue = joiner.join(value.map {
         let expandedValue = self.expand(value: "\($0)")
@@ -480,7 +480,7 @@ class FormStyleQueryExpansion : BaseOperator, Operator {
   }
 
   override func expand(# variable:String, value:[String:AnyObject], explode:Bool) -> String? {
-    if countElements(value) > 0 {
+    if count(value) > 0 {
       let expandedVariable = self.expand(value: variable)
       let expandedValue = super.expand(variable: variable, value: value, explode: explode)
 
