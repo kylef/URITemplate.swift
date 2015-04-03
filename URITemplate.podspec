@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name = 'URITemplate'
-  spec.version = '1.1.0'
+  spec.version = '1.1.1'
   spec.summary = 'Swift library for dealing with URI Templates (RFC6570)'
   spec.homepage = 'https://github.com/kylef/URITemplate.swift'
   spec.license = { :type => 'MIT', :file => 'LICENSE' }
