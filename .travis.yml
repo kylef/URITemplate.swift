@@ -1,7 +1,9 @@
 language: objective-c
 before_install:
-  - gem install cocoapods
-  - gem install xcpretty
+- gem install cocoapods --no-document
+- gem install xcpretty --no-document
 script:
-  - xcodebuild -project URITemplate.xcodeproj -scheme URITemplate test -sdk macosx | xcpretty -c && exit ${PIPESTATUS[0]}
-  - xcodebuild -project URITemplate.xcodeproj -scheme URITemplate test -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO | xcpretty -c && exit ${PIPESTATUS[0]}
+- set -o pipefail
+- xcodebuild -project URITemplate.xcodeproj -scheme URITemplate test -sdk macosx | xcpretty -c
+- xcodebuild -project URITemplate.xcodeproj -scheme URITemplate test -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO | xcpretty -c
+- pod lib lint
