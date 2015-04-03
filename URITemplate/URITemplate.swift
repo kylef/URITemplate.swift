@@ -170,7 +170,7 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
       return self.regexForVariable(variable, op: op)
     }
 
-    return join("", regexes)
+    return join((op ?? StringExpansion()).joiner, regexes)
   }
 
   var extractionRegex:NSRegularExpression? {

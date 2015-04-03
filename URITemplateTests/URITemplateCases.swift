@@ -47,7 +47,7 @@ func testExtraction(suite:Suite, testcase:Case) {
   ]
 
   let supportedExpansionLevel = 4
-  let supportedExtractionLevel = 2
+  let supportedExtractionLevel = 3
 
   override class func testInvocations() -> [AnyObject] {
     let tests = URITemplateCasesTests()
