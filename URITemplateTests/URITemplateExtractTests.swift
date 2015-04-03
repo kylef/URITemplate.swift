@@ -20,7 +20,7 @@ class URITemplateExtractTests: XCTestCase {
 
   func testHandlesCompositeValues() {
     let template = URITemplate(template:"https://api.github.com/repos/{owner}/{repo}/")
-    XCTAssertEqual(template.extract("https://api.github.com/repos/kylef/PathKit/")! as [String:String], ["owner":"kylef", "repo":"PathKit"])
+    XCTAssertEqual(template.extract("https://api.github.com/repos/kylef/PathKit/")!, ["owner":"kylef", "repo":"PathKit"])
   }
 
   func testMatchWithoutVariables() {
@@ -31,5 +31,10 @@ class URITemplateExtractTests: XCTestCase {
   func testNoVariablesNoMatch() {
     let template = URITemplate(template:"https://api.github.com/repos/kylef/URITemplate")
     XCTAssertNil(template.extract("https://api.github.com/repos/kylef/PatkKit"))
+  }
+
+  func testVariablesNoMatch() {
+    let template = URITemplate(template:"https://api.github.com/repos/{owner}")
+    XCTAssertNil(template.extract("https://api.github.com/repos/kylef/WebLinking"))
   }
 }

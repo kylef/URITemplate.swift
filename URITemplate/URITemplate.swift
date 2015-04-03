@@ -154,10 +154,12 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
     let pattern = regex.substitute(self.template) { expression in
       if expression.hasPrefix("{") && expression.hasSuffix("}") {
         var startIndex = expression.startIndex.successor()
+        var usingOp = false
 
         for op in self.operators {
           if let op = op.op {
             if expression.hasPrefix("{\(op)") {
+              usingOp = true
               startIndex = startIndex.successor()
               break
             }
@@ -169,7 +171,11 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
 
         let regexes = expression.componentsSeparatedByString(",").map { variable -> String in
           variables.insert(variable, atIndex:0)
-          return "(.*)"
+          if usingOp {
+            return "(.*)"
+          } else {
+            return "([A-z0-9%]+)"
+          }
         }
 
         return join("", regexes)

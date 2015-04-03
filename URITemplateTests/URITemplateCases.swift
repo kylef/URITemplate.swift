@@ -34,7 +34,7 @@ func testExtraction(suite:Suite, testcase:Case) {
 
       XCTAssertEqual(variables as NSDictionary, expectedVariables as NSDictionary, "\(template)")
     } else {
-      XCTFail("Extracted no match")
+      XCTFail("Extracted no match template: \(template) with uri: \(uri)")
     }
   }
 }
