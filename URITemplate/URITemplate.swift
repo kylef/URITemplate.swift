@@ -147,45 +147,51 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
     }
   }
 
-  /// Extract the variables used in a given URL
-  public func extract(url:String) -> [String:String]? {
-    var variables = [String]()
+  func regexForVariable(variable:String, op:Operator?) -> String {
+    if let op = op {
+      return "(.*)"
+    } else {
+      return "([A-z0-9%_\\-]+)"
+    }
+  }
+
+  func regexForExpression(expression:String) -> String {
+    var expression = expression
+
+    let op = operators.filter {
+      $0.op != nil && expression.hasPrefix($0.op!)
+    }.first
+
+    if let op = op {
+      expression = expression.substringWithRange(expression.startIndex.successor()..<expression.endIndex)
+    }
+
+    let regexes = expression.componentsSeparatedByString(",").map { variable -> String in
+      return self.regexForVariable(variable, op: op)
+    }
+
+    return join("", regexes)
+  }
+
+  var extractionRegex:NSRegularExpression? {
     let regex = NSRegularExpression(pattern: "(\\{([^\\}]+)\\})|[^(.*)]", options: NSRegularExpressionOptions(0), error: nil)!
+
     let pattern = regex.substitute(self.template) { expression in
       if expression.hasPrefix("{") && expression.hasSuffix("}") {
         var startIndex = expression.startIndex.successor()
-        var usingOp = false
-
-        for op in self.operators {
-          if let op = op.op {
-            if expression.hasPrefix("{\(op)") {
-              usingOp = true
-              startIndex = startIndex.successor()
-              break
-            }
-          }
-        }
-
         let endIndex = expression.endIndex.predecessor()
-        let expression = expression.substringWithRange(startIndex..<endIndex)
-
-        let regexes = expression.componentsSeparatedByString(",").map { variable -> String in
-          variables.insert(variable, atIndex:0)
-          if usingOp {
-            return "(.*)"
-          } else {
-            return "([A-z0-9%]+)"
-          }
-        }
-
-        return join("", regexes)
+        return self.regexForExpression(expression.substringWithRange(startIndex..<endIndex))
       } else {
         return NSRegularExpression.escapedPatternForString(expression)
       }
     }
 
-    let expression = NSRegularExpression(pattern: "^\(pattern)$", options: NSRegularExpressionOptions(0), error: nil)
-    if let expression = expression {
+    return NSRegularExpression(pattern: "^\(pattern)$", options: NSRegularExpressionOptions(0), error: nil)
+  }
+
+  /// Extract the variables used in a given URL
+  public func extract(url:String) -> [String:String]? {
+    if let expression = extractionRegex {
       let matches = expression.matches(url)
       let input = url as NSString
       let range = NSRange(location: 0, length: input.length)
