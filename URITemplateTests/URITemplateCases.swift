@@ -112,13 +112,14 @@ struct Suite {
 
   init(name:String, testSuite:Dictionary<String, AnyObject>) {
     self.name = name
-    variables = testSuite["variables"] as Dictionary<String, AnyObject>
-    let testcases = testSuite["testcases"] as [[AnyObject]]
+    variables = testSuite["variables"] as! Dictionary<String, AnyObject>
+    let testcases = testSuite["testcases"] as! [[AnyObject]]
     cases = testcases.map { Case(object:$0) }
 
-    level = 4
     if let testLevel = testSuite["level"] as? Int {
       level = testLevel
+    } else {
+      level = 4
     }
   }
 }
@@ -128,11 +129,11 @@ struct Case {
   let expected:[String]
 
   init(object:[AnyObject]) {
-    template = object[0] as String
+    template = object[0] as! String
     if let expected = object[1] as? [String] {
       self.expected = expected
     } else {
-      expected = [object[1] as String]
+      expected = [object[1] as! String]
     }
   }
 
@@ -148,7 +149,7 @@ func loadFixture(URL:NSURL) -> Dictionary<String, AnyObject> {
   var error:NSError?
   let object: AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &error)
   assert(error == nil)
-  return object as Dictionary<String, AnyObject>
+  return object as! Dictionary<String, AnyObject>
 }
 
 func loadSuites(urls:[NSURL]) -> [Suite] {
