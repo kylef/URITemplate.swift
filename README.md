@@ -3,6 +3,14 @@ URITemplate
 
 Swift implementation of URI Template ([RFC6570](https://tools.ietf.org/html/rfc6570)).
 
+## Installation
+
+[CocoaPods](http://cocoapods.org/) is the recommended installation method.
+
+```ruby
+pod 'URITemplate'
+```
+
 ## Example
 
 ### Expanding a URI Template
