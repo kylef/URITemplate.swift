@@ -12,6 +12,7 @@ import Foundation
 
 /// A data structure to represent an RFC6570 URI template.
 public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvertible, ExtendedGraphemeClusterLiteralConvertible, UnicodeScalarLiteralConvertible {
+  /// The underlying URI template
   public let template:String
 
   var regex:NSRegularExpression {
@@ -34,6 +35,7 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
     ]
   }
 
+  /// Initialize a URITemplate with the given template
   public init(template:String) {
     self.template = template
   }
@@ -52,6 +54,7 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
     template = value
   }
 
+  /// Returns a description of the URITemplate
   public var description:String {
     return template
   }
@@ -214,6 +217,7 @@ public struct URITemplate : Printable, Equatable, Hashable, StringLiteralConvert
   }
 }
 
+/// Determine if two URITemplate's are equivalent
 public func ==(lhs:URITemplate, rhs:URITemplate) -> Bool {
   return lhs.template == rhs.template
 }
