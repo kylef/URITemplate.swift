@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "2202450528CFA50DD806F0340B3987713E89BFB6",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "2202450528CFA50DD806F0340B3987713E89BFB6" : 0,
+    "7BB2FEFCEC73967FEC5025D3BB10FFCAF0030B19" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "EF513D02-50C0-4F7A-88EC-2BADB902179D",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "2202450528CFA50DD806F0340B3987713E89BFB6" : "URITemplate.swift\/",
+    "7BB2FEFCEC73967FEC5025D3BB10FFCAF0030B19" : "URITemplate.swift\/URITemplateTests\/Cases\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "URITemplate",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 203,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "URITemplate.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/kylef\/URITemplate.swift",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "2202450528CFA50DD806F0340B3987713E89BFB6"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/uri-templates\/uritemplate-test",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "7BB2FEFCEC73967FEC5025D3BB10FFCAF0030B19"
+    }
+  ]
+}
