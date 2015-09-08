@@ -38,7 +38,7 @@ func testExtraction(suite:Suite, testcase:Case) {
   }
 }
 
-@objc class URITemplateCasesTests : XCTestCase {
+class URITemplateCasesTests : DynamicTestCase {
   let files = [
     "extended-tests",
     "spec-examples-by-section",
@@ -48,44 +48,44 @@ func testExtraction(suite:Suite, testcase:Case) {
   let supportedExpansionLevel = 4
   let supportedExtractionLevel = 3
 
-//  override class func testInvocations() -> [AnyObject] {
-//    let tests = URITemplateCasesTests()
-//    var invocations = [AnyObject]()
-//
-//    for suite in tests.suites() {
-//      for (index, testcase) in suite.cases.enumerate() {
-//        if tests.supportedExpansionLevel >= suite.level {
-//          invocations.append(addTest("\(suite.name) Case \(index) Expansion") {
-//            testExpansion(suite, testcase: testcase)
-//          })
-//        }
-//
-//        if tests.supportedExtractionLevel >= suite.level {
-//          invocations.append(addTest("\(suite.name) Case \(index) Extraction") {
-//            testExtraction(suite, testcase: testcase)
-//          })
-//        }
-//      }
-//    }
-//
-//    return invocations
-//  }
+  override class func testSelectors() -> [String] {
+    let tests = URITemplateCasesTests()
+    var invocations = [String]()
 
-//  class func addTest(name:String, closure:() -> ()) -> AnyObject {
-//    let block : @objc_block (AnyObject!) -> () = { (instance : AnyObject!) -> () in
-//      closure()
-//    }
-//
-//    let imp = imp_implementationWithBlock(unsafeBitCast(block, AnyObject.self))
-//    let selectorName = name.stringByReplacingOccurrencesOfString(" ", withString: "_", options: NSStringCompareOptions(rawValue: 0), range: nil)
-//    let selector = Selector(selectorName)
-//    let method = class_getInstanceMethod(self, "example") // No @encode in swift, creating a dummy method to get encoding
-//    let types = method_getTypeEncoding(method)
-//    let added = class_addMethod(self, selector, imp, types)
-//    assert(added, "Failed to add `\(name)` as `\(selector)`")
-//
-//    return self.testCaseWithSelector(selector).invocation
-//  }
+    for suite in tests.suites() {
+      for (index, testcase) in suite.cases.enumerate() {
+        if tests.supportedExpansionLevel >= suite.level {
+          invocations.append(addTest("\(suite.name) Case \(index) Expansion") {
+            testExpansion(suite, testcase: testcase)
+          })
+        }
+
+        if tests.supportedExtractionLevel >= suite.level {
+          invocations.append(addTest("\(suite.name) Case \(index) Extraction") {
+            testExtraction(suite, testcase: testcase)
+          })
+        }
+      }
+    }
+
+    return invocations
+  }
+
+  class func addTest(name:String, closure:() -> ()) -> String {
+    let block : @convention(block) (AnyObject!) -> () = { (instance : AnyObject!) -> () in
+      closure()
+    }
+
+    let imp = imp_implementationWithBlock(unsafeBitCast(block, AnyObject.self))
+    let selectorName = name.stringByReplacingOccurrencesOfString(" ", withString: "_", options: NSStringCompareOptions(rawValue: 0), range: nil)
+    let selector = Selector(selectorName)
+    let method = class_getInstanceMethod(self, "example") // No @encode in swift, creating a dummy method to get encoding
+    let types = method_getTypeEncoding(method)
+    let added = class_addMethod(self, selector, imp, types)
+    assert(added, "Failed to add `\(name)` as `\(selector)`")
+
+    return selectorName
+  }
 
   func example() { /* See addTest() */ }
 

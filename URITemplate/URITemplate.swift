@@ -357,7 +357,7 @@ class ReservedExpansion : BaseOperator, Operator {
   override var joiner:String { return "," }
 
   override func expand(value  value:String) -> String {
-    return value.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
+    return value.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!
   }
 }
 
@@ -368,7 +368,7 @@ class FragmentExpansion : BaseOperator, Operator {
   override var joiner:String { return "," }
 
   override func expand(value  value:String) -> String {
-    return value.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
+    return value.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLFragmentAllowedCharacterSet())!
   }
 }
 
@@ -398,7 +398,7 @@ class PathSegmentExpansion : BaseOperator, Operator {
   override var joiner:String { return "/" }
 
   override func expand(value  value:String) -> String {
-    return value.percentEncoded()
+    return value.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLPathAllowedCharacterSet())!
   }
 
   override func expand(variable  variable:String, value:[AnyObject], explode:Bool) -> String? {
