@@ -146,7 +146,7 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, String
       })
 
       if expansions.count > 0 {
-        return op!.prefix + op!.joiner.join(expansions)
+        return op!.prefix + expansions.joinWithSeparator(op!.joiner)
       }
 
       return ""
@@ -176,7 +176,7 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, String
       return self.regexForVariable(variable, op: op)
     }
 
-    return (op ?? StringExpansion()).joiner.join(regexes)
+    return regexes.joinWithSeparator((op ?? StringExpansion()).joiner)
   }
 
   var extractionRegex:NSRegularExpression? {
@@ -306,7 +306,7 @@ class BaseOperator {
   func expand(variable  variable:String, value:String, prefix:Int?) -> String {
     if let prefix = prefix {
       if value.characters.count > prefix {
-        let index = advance(value.startIndex, prefix)
+        let index = value.startIndex.advancedBy(prefix, limit: value.endIndex)
         return expand(value: value.substringToIndex(index))
       }
     }
@@ -317,7 +317,7 @@ class BaseOperator {
   // Point to overide to expanding an array
   func expand(variable  variable:String, value:[AnyObject], explode:Bool) -> String? {
     let joiner = explode ? self.joiner : ","
-    return joiner.join(value.map { self.expand(value: "\($0)") })
+    return value.map { self.expand(value: "\($0)") }.joinWithSeparator(joiner)
   }
 
   // Point to overide to expanding a dictionary
@@ -330,7 +330,7 @@ class BaseOperator {
       return "\(expandedKey)\(keyValueJoiner)\(expandedValue)"
     })
 
-    return joiner.join(elements)
+    return elements.joinWithSeparator(joiner)
   }
 
   // Point to overide when value not found
@@ -431,7 +431,7 @@ class PathStyleParameterExpansion : BaseOperator, Operator {
 
   override func expand(variable  variable:String, value:[AnyObject], explode:Bool) -> String? {
     let joiner = explode ? self.joiner : ","
-    let expandedValue = joiner.join(value.map {
+    let expandedValue = value.map {
       let expandedValue = self.expand(value: "\($0)")
 
       if explode {
@@ -439,7 +439,7 @@ class PathStyleParameterExpansion : BaseOperator, Operator {
       }
 
       return expandedValue
-    })
+    }.joinWithSeparator(joiner)
 
     if !explode {
       return "\(variable)=\(expandedValue)"
@@ -479,7 +479,7 @@ class FormStyleQueryExpansion : BaseOperator, Operator {
   override func expand(variable  variable:String, value:[AnyObject], explode:Bool) -> String? {
     if value.count > 0 {
       let joiner = explode ? self.joiner : ","
-      let expandedValue = joiner.join(value.map {
+      let expandedValue = value.map {
         let expandedValue = self.expand(value: "\($0)")
 
         if explode {
@@ -487,7 +487,7 @@ class FormStyleQueryExpansion : BaseOperator, Operator {
         }
 
         return expandedValue
-      })
+      }.joinWithSeparator(joiner)
 
       if !explode {
         return "\(variable)=\(expandedValue)"
@@ -534,7 +534,7 @@ class FormStyleQueryContinuation : BaseOperator, Operator {
 
   override func expand(variable  variable:String, value:[AnyObject], explode:Bool) -> String? {
     let joiner = explode ? self.joiner : ","
-    let expandedValue = joiner.join(value.map {
+    let expandedValue = value.map {
       let expandedValue = self.expand(value: "\($0)")
 
       if explode {
@@ -542,7 +542,7 @@ class FormStyleQueryContinuation : BaseOperator, Operator {
       }
 
       return expandedValue
-      })
+    }.joinWithSeparator(joiner)
 
     if !explode {
       return "\(variable)=\(expandedValue)"
