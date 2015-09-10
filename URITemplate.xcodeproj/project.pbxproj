@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2771CF271B9F54A200F1A11F /* DynamicTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 2771CF261B9F54A200F1A11F /* DynamicTestCase.m */; settings = {ASSET_TAGS = (); }; };
 		77356D861A253325002822CF /* URITemplate.h in Headers */ = {isa = PBXBuildFile; fileRef = 77356D851A253325002822CF /* URITemplate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		77356D8C1A253325002822CF /* URITemplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77356D801A253325002822CF /* URITemplate.framework */; };
 		77356D931A253325002822CF /* URITemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77356D921A253325002822CF /* URITemplateTests.swift */; };
@@ -35,6 +36,9 @@
 		2761AB841A42478200093A2F /* UniversalFramework_Base.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = UniversalFramework_Base.xcconfig; sourceTree = "<group>"; };
 		2761AB851A42478200093A2F /* UniversalFramework_Framework.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = UniversalFramework_Framework.xcconfig; sourceTree = "<group>"; };
 		2761AB861A42478200093A2F /* UniversalFramework_Test.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = UniversalFramework_Test.xcconfig; sourceTree = "<group>"; };
+		2771CF241B9F54A100F1A11F /* URITemplateTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "URITemplateTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		2771CF251B9F54A200F1A11F /* DynamicTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DynamicTestCase.h; sourceTree = "<group>"; };
+		2771CF261B9F54A200F1A11F /* DynamicTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DynamicTestCase.m; sourceTree = "<group>"; };
 		77356D801A253325002822CF /* URITemplate.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = URITemplate.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		77356D841A253325002822CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		77356D851A253325002822CF /* URITemplate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = URITemplate.h; sourceTree = "<group>"; };
@@ -128,8 +132,11 @@
 				77356DAF1A255A40002822CF /* URITemplateVariablesTests.swift */,
 				779F8C711A262A6800F7C9DF /* URITemplateExtractTests.swift */,
 				77356DAD1A254673002822CF /* URITemplateCases.swift */,
+				2771CF251B9F54A200F1A11F /* DynamicTestCase.h */,
+				2771CF261B9F54A200F1A11F /* DynamicTestCase.m */,
 				77356D9E1A254642002822CF /* Cases */,
 				77356D901A253325002822CF /* Supporting Files */,
+				2771CF241B9F54A100F1A11F /* URITemplateTests-Bridging-Header.h */,
 			);
 			path = URITemplateTests;
 			sourceTree = "<group>";
@@ -209,7 +216,8 @@
 		77356D771A253325002822CF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0610;
+				LastSwiftUpdateCheck = 0700;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "Kyle Fuller";
 				TargetAttributes = {
 					77356D7F1A253325002822CF = {
@@ -273,6 +281,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				77356DB01A255A40002822CF /* URITemplateVariablesTests.swift in Sources */,
+				2771CF271B9F54A200F1A11F /* DynamicTestCase.m in Sources */,
 				77356DAE1A254673002822CF /* URITemplateCases.swift in Sources */,
 				779F8C721A262A6800F7C9DF /* URITemplateExtractTests.swift in Sources */,
 				77356DB21A255A7E002822CF /* URITemplateExpansionTests.swift in Sources */,
@@ -311,6 +320,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -386,6 +396,7 @@
 				INFOPLIST_FILE = URITemplate/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocode.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -406,6 +417,7 @@
 				INFOPLIST_FILE = URITemplate/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocode.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
@@ -415,6 +427,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 2761AB861A42478200093A2F /* UniversalFramework_Test.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -422,7 +435,10 @@
 				);
 				INFOPLIST_FILE = URITemplateTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "uk.co.kylefuller.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "URITemplateTests/URITemplateTests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -430,10 +446,13 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 2761AB861A42478200093A2F /* UniversalFramework_Test.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = URITemplateTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "uk.co.kylefuller.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "URITemplateTests/URITemplateTests-Bridging-Header.h";
 			};
 			name = Release;
 		};

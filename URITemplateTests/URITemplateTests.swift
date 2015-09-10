@@ -50,6 +50,9 @@ class URITemplateTests: XCTestCase {
   // MARK: StringLiteralConvertible
 
   func testStringLiteralConvertible() {
-    let template:URITemplate = "{scheme}://{hostname}/"
+    let literalTemplate:URITemplate = "{scheme}://{hostname}/"
+    let template = URITemplate(template:"{scheme}://{hostname}/")
+
+    XCTAssertEqual(literalTemplate, template)
   }
 }
