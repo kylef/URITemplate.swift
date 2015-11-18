@@ -7,10 +7,6 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, String
   /// The underlying URI template
   public let template: String
 
-  var regex: NSRegularExpression {
-    return try! NSRegularExpression(pattern: "\\{([^\\}]+)\\}", options: NSRegularExpressionOptions())
-  }
-
   var operators: [Operator] {
     return [
       StringExpansion(),
@@ -52,90 +48,87 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, String
     return template.hashValue
   }
 
-  /// Returns the set of keywords in the URI Template
-  public var variables: [String] {
-    let expressions = regex.matches(template).map { expression in
-      // Removes the { and } from the expression
-      expression.substringWithRange(expression.startIndex.successor()..<expression.endIndex.predecessor())
+  /// Returns the all of expressions in the URI Template
+  var expressions: [String] {
+    var expressions: [String] = []
+
+    let scanner = Scanner(content: template)
+    while !scanner.isEmpty {
+      scanner.scan(until: "{")
+
+      if !scanner.isEmpty {
+        let expression = scanner.scan(until: "}")
+        expressions.append(expression)
+      }
     }
 
-    return expressions.map { expression -> [String] in
-      var expression = expression
+    return expressions
+  }
 
-      for op in self.operators {
-        if let op = op.op {
-          if expression.hasPrefix(op) {
-            expression = expression.substringFromIndex(expression.startIndex.successor())
-            break
-          }
+  /// Constructs a string from the template by mapping the expressions
+  func expressionSubstitute(closure: String -> String) -> String {
+    var output = ""
+
+    let scanner = Scanner(content: template)
+    while !scanner.isEmpty {
+      output.appendContentsOf(scanner.scan(until: "{"))
+
+      if !scanner.isEmpty {
+        let expression = scanner.scan(until: "}")
+        output.appendContentsOf(closure(expression))
+      }
+    }
+
+    return output
+  }
+
+  /// Returns all of keywords found in the URI Template
+  public var variables: [String] {
+    func trimOperator(expression: String) -> String {
+      if let prefix = expression.characters.first {
+        let isOperator = operators.flatMap { $0.op }.contains(prefix)
+        if isOperator {
+          return expression[expression.startIndex.successor()..<expression.endIndex]
         }
       }
 
-      return expression.componentsSeparatedByString(",").map { component in
-        if component.hasSuffix("*") {
-          return component.substringToIndex(expression.endIndex.predecessor())
-        } else {
-          return component
-        }
+      return expression
+    }
+
+    func stripExplode(expression: String) -> String {
+      if expression.hasSuffix("*") {
+        return expression[expression.startIndex..<expression.endIndex.predecessor()]
       }
-    }.reduce([], combine: +)
+
+      return expression
+    }
+
+    func splitExpression(expression: String) -> [String] {
+      return expression.characters.split(",").map(String.init)
+    }
+
+    return expressions
+      .map(trimOperator)
+      .map(splitExpression)
+      .reduce([], combine: +)
+      .map(stripExplode)
   }
 
   /// Expand template as a URI Template using the given variables
-  public func expand(variables: [String:AnyObject]) -> String {
-    return regex.substitute(template) { string in
-      var expression = string.substringWithRange(string.startIndex.successor()..<string.endIndex.predecessor())
-      let firstCharacter = expression.substringToIndex(expression.startIndex.successor())
-
-      var op = self.operators.filter {
-        if let op = $0.op {
-          return op == firstCharacter
-        }
-
-        return false
-      }.first
-
-      if (op != nil) {
-        expression = expression.substringFromIndex(expression.startIndex.successor())
-      } else {
-        op = self.operators.first
+  public func expand(variables: [String: AnyObject]) -> String {
+    func findOperator(expression: String) -> (Operator, String) {
+      let firstCharacter = expression.characters.first
+      let ops = operators.filter { $0.op == firstCharacter }
+      if let op = ops.first {
+        return (op, expression[expression.startIndex.successor()..<expression.endIndex])
       }
 
-      let rawExpansions = expression.componentsSeparatedByString(",").map { vari -> String? in
-        var variable = vari
-        var prefix: Int?
+      return (StringExpansion(), expression)
+    }
 
-        if let range = variable.rangeOfString(":") {
-          prefix = Int(variable.substringFromIndex(range.endIndex))
-          variable = variable.substringToIndex(range.startIndex)
-        }
-
-        let explode = variable.hasSuffix("*")
-
-        if explode {
-          variable = variable.substringToIndex(variable.endIndex.predecessor())
-        }
-
-        if let value = variables[variable] {
-          return op!.expand(variable, value: value, explode: explode, prefix:prefix)
-        }
-
-        return op!.expand(variable, value:nil, explode:false, prefix:prefix)
-      }
-
-      let expansions = rawExpansions.reduce([]) { (accumulator, expansion) -> [String] in
-        if let expansion = expansion {
-          return accumulator + [expansion]
-        }
-
-        return accumulator
-      }
-
-      if !expansions.isEmpty {
-        return op!.prefix + expansions.joinWithSeparator(op!.joiner)
-      }
-
-      return ""
+    return expressionSubstitute { string in
+      let (op, expression) = findOperator(string)
+      return op.expand(expression: expression, variables: variables)
     }
   }
 
@@ -151,11 +144,11 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, String
     var expression = expression
 
     let op = operators.filter {
-      $0.op != nil && expression.hasPrefix($0.op!)
+      $0.op != nil && expression.hasPrefix(String($0.op!))
     }.first
 
     if op != nil {
-      expression = expression.substringWithRange(expression.startIndex.successor()..<expression.endIndex)
+      expression = expression[expression.startIndex.successor()..<expression.endIndex]
     }
 
     let regexes = expression.componentsSeparatedByString(",").map {
@@ -172,7 +165,7 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, String
       if expression.hasPrefix("{") && expression.hasSuffix("}") {
         let startIndex = expression.startIndex.successor()
         let endIndex = expression.endIndex.predecessor()
-        return self.regexForExpression(expression.substringWithRange(startIndex..<endIndex))
+        return self.regexForExpression(expression[startIndex..<endIndex])
       } else {
         return NSRegularExpression.escapedPatternForString(expression)
       }
@@ -206,7 +199,7 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, String
 }
 
 /// Determine if two URITemplate's are equivalent
-public func ==(lhs: URITemplate, rhs: URITemplate) -> Bool {
+public func == (lhs: URITemplate, rhs: URITemplate) -> Bool {
   return lhs.template == rhs.template
 }
 
@@ -227,16 +220,6 @@ extension NSRegularExpression {
 
     return newString as String
   }
-
-  func matches(string: String) -> [String] {
-    let input = string as NSString
-    let range = NSRange(location: 0, length: input.length)
-    let results = matchesInString(string, options: NSMatchingOptions(rawValue: 0), range: range)
-
-    return results.map { result -> String in
-      return input.substringWithRange(result.range)
-    }
-  }
 }
 
 extension String {
@@ -250,7 +233,7 @@ extension String {
 
 protocol Operator {
   /// Operator
-  var op:String? { get }
+  var op: Character? { get }
 
   /// Prefix for the expanded string
   var prefix:String { get }
@@ -259,6 +242,42 @@ protocol Operator {
   var joiner:String { get }
 
   func expand(variable: String, value: AnyObject?, explode: Bool, prefix: Int?) -> String?
+}
+
+extension Operator {
+  func expand(expression expression: String, variables: [String: AnyObject]) -> String {
+    let expansions = expression.characters.split(",").map(String.init)
+      .flatMap { expand(variable: $0, variables: variables) }
+      .reduce([]) { $0 + [$1] }
+
+    if !expansions.isEmpty {
+      return prefix + expansions.joinWithSeparator(joiner)
+    }
+
+    return ""
+  }
+
+  func expand(variable variable: String, variables: [String: AnyObject]) -> String? {
+    var variable = variable
+    var prefix: Int?
+
+    if let range = variable.rangeOfString(":") {
+      prefix = Int(variable.substringFromIndex(range.endIndex))
+      variable = variable.substringToIndex(range.startIndex)
+    }
+
+    let explode = variable.hasSuffix("*")
+
+    if explode {
+      variable = variable.substringToIndex(variable.endIndex.predecessor())
+    }
+
+    if let value = variables[variable] {
+      return expand(variable, value: value, explode: explode, prefix:prefix)
+    }
+
+    return expand(variable, value:nil, explode:false, prefix:prefix)
+  }
 }
 
 class BaseOperator {
@@ -322,7 +341,7 @@ class BaseOperator {
 
 /// RFC6570 (3.2.2) Simple String Expansion: {var}
 class StringExpansion : BaseOperator, Operator {
-  var op: String? { return nil }
+  var op: Character? { return nil }
   var prefix: String { return "" }
   override var joiner: String { return "," }
 
@@ -333,7 +352,7 @@ class StringExpansion : BaseOperator, Operator {
 
 /// RFC6570 (3.2.3) Reserved Expansion: {+var}
 class ReservedExpansion : BaseOperator, Operator {
-  var op: String? { return "+" }
+  var op: Character? { return "+" }
   var prefix: String { return "" }
   override var joiner: String { return "," }
 
@@ -344,7 +363,7 @@ class ReservedExpansion : BaseOperator, Operator {
 
 /// RFC6570 (3.2.4) Fragment Expansion {#var}
 class FragmentExpansion : BaseOperator, Operator {
-  var op: String? { return "#" }
+  var op: Character? { return "#" }
   var prefix: String { return "#" }
   override var joiner: String { return "," }
 
@@ -355,7 +374,7 @@ class FragmentExpansion : BaseOperator, Operator {
 
 /// RFC6570 (3.2.5) Label Expansion with Dot-Prefix: {.var}
 class LabelExpansion : BaseOperator, Operator {
-  var op: String? { return "." }
+  var op: Character? { return "." }
   var prefix: String { return "." }
   override var joiner: String { return "." }
 
@@ -374,7 +393,7 @@ class LabelExpansion : BaseOperator, Operator {
 
 /// RFC6570 (3.2.6) Path Segment Expansion: {/var}
 class PathSegmentExpansion : BaseOperator, Operator {
-  var op: String? { return "/" }
+  var op: Character? { return "/" }
   var prefix: String { return "/" }
   override var joiner: String { return "/" }
 
@@ -393,7 +412,7 @@ class PathSegmentExpansion : BaseOperator, Operator {
 
 /// RFC6570 (3.2.7) Path-Style Parameter Expansion: {;var}
 class PathStyleParameterExpansion : BaseOperator, Operator {
-  var op: String? { return ";" }
+  var op: Character? { return ";" }
   var prefix: String { return ";" }
   override var joiner: String { return ";" }
 
@@ -444,7 +463,7 @@ class PathStyleParameterExpansion : BaseOperator, Operator {
 
 /// RFC6570 (3.2.8) Form-Style Query Expansion: {?var}
 class FormStyleQueryExpansion : BaseOperator, Operator {
-  var op: String? { return "?" }
+  var op: Character? { return "?" }
   var prefix: String { return "?" }
   override var joiner: String { return "&" }
 
@@ -498,7 +517,7 @@ class FormStyleQueryExpansion : BaseOperator, Operator {
 
 /// RFC6570 (3.2.9) Form-Style Query Continuation: {&var}
 class FormStyleQueryContinuation : BaseOperator, Operator {
-  var op: String? { return "&" }
+  var op: Character? { return "&" }
   var prefix: String { return "&" }
   override var joiner: String { return "&" }
 
@@ -538,5 +557,29 @@ class FormStyleQueryContinuation : BaseOperator, Operator {
     }
 
     return expandedValue
+  }
+}
+
+class Scanner {
+  var content: String
+
+  init(content: String) {
+    self.content = content
+  }
+
+  var isEmpty: Bool {
+    return content.isEmpty
+  }
+
+  func scan(until until: Character) -> String {
+    let parts = content.characters.split(until, maxSplit: 1, allowEmptySlices: true).map(String.init)
+
+    if parts.count == 2 {
+      content = parts[1]
+    } else {
+      content = ""
+    }
+
+    return parts[0]
   }
 }
