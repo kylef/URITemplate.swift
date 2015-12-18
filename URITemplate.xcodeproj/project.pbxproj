@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2771CF271B9F54A200F1A11F /* DynamicTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 2771CF261B9F54A200F1A11F /* DynamicTestCase.m */; settings = {ASSET_TAGS = (); }; };
+		2771CF271B9F54A200F1A11F /* DynamicTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 2771CF261B9F54A200F1A11F /* DynamicTestCase.m */; };
 		77356D861A253325002822CF /* URITemplate.h in Headers */ = {isa = PBXBuildFile; fileRef = 77356D851A253325002822CF /* URITemplate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		77356D8C1A253325002822CF /* URITemplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77356D801A253325002822CF /* URITemplate.framework */; };
 		77356D931A253325002822CF /* URITemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77356D921A253325002822CF /* URITemplateTests.swift */; };
@@ -113,7 +113,8 @@
 				77356D9C1A2534BE002822CF /* URITemplate.swift */,
 				77356D831A253325002822CF /* Supporting Files */,
 			);
-			path = URITemplate;
+			name = URITemplate;
+			path = Sources;
 			sourceTree = "<group>";
 		};
 		77356D831A253325002822CF /* Supporting Files */ = {
@@ -138,7 +139,8 @@
 				77356D901A253325002822CF /* Supporting Files */,
 				2771CF241B9F54A100F1A11F /* URITemplateTests-Bridging-Header.h */,
 			);
-			path = URITemplateTests;
+			name = URITemplateTests;
+			path = Tests;
 			sourceTree = "<group>";
 		};
 		77356D901A253325002822CF /* Supporting Files */ = {
@@ -393,7 +395,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = URITemplate/Info.plist;
+				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
@@ -416,7 +418,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = URITemplate/Info.plist;
+				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
@@ -437,11 +439,11 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = URITemplateTests/Info.plist;
+				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "uk.co.kylefuller.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "URITemplateTests/URITemplateTests-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Tests/URITemplateTests-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -452,11 +454,11 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = URITemplateTests/Info.plist;
+				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "uk.co.kylefuller.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "URITemplateTests/URITemplateTests-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Tests/URITemplateTests-Bridging-Header.h";
 			};
 			name = Release;
 		};
