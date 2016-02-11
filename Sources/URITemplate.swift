@@ -87,7 +87,7 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, String
 
       return expression.componentsSeparatedByString(",").map { component in
         if component.hasSuffix("*") {
-          return component.substringToIndex(expression.endIndex.predecessor())
+          return component.substringToIndex(component.endIndex.predecessor())
         } else {
           return component
         }
