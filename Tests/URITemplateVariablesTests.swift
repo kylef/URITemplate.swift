@@ -62,4 +62,9 @@ class URITemplateVariablesTests : XCTestCase {
     let template = URITemplate(template:"{/list*}")
     XCTAssertEqual(template.variables, ["list"])
   }
+
+  func testMixedQueryParameterVariables() {
+    let template = URITemplate(template:"{scheme}://{hostname}/endpoint.json{?query,list*}")
+    XCTAssert(template.variables.contains("hostname"))
+  }
 }
