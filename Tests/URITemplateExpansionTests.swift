@@ -72,4 +72,10 @@ class URITemplateExpansionTests: XCTestCase {
         let expanded = template.expand(["names": ["Kyle", "Maxine"]])
         XCTAssertEqual(expanded, ".Kyle.Maxine")
     }
+	
+	func testURLEncodedSpaces() {
+		let template = URITemplate(template:"http://www.host.com/endpoint{?postal}")
+		let expanded = template.expand(["postal": "V3N 2R2"])
+		XCTAssertEqual(expanded, "http://www.host.com/endpoint?postal=V3N%202R2")
+	}
 }
