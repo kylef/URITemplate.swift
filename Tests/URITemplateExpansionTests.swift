@@ -78,4 +78,16 @@ class URITemplateExpansionTests: XCTestCase {
 		let expanded = template.expand(["postal": "V3N 2R2"])
 		XCTAssertEqual(expanded, "http://www.host.com/endpoint?postal=V3N%202R2")
 	}
+	
+	func testURLEncodedQuotes() {
+		let template = URITemplate(template:"http://www.host.com/endpoint{?test}")
+		let expanded = template.expand(["test": "\"V3N\""])
+		XCTAssertEqual(expanded, "http://www.host.com/endpoint?test=%22V3N%22")
+	}
+	
+	func testURLEncodedCarrot() {
+		let template = URITemplate(template:"http://www.host.com/endpoint{?test}")
+		let expanded = template.expand(["test": "V3N^2R2"])
+		XCTAssertEqual(expanded, "http://www.host.com/endpoint?test=V3N%5E2R2")
+	}
 }
