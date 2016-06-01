@@ -79,7 +79,7 @@ class URITemplateCasesTests : DynamicTestCase {
     let imp = imp_implementationWithBlock(unsafeBitCast(block, AnyObject.self))
     let selectorName = name.stringByReplacingOccurrencesOfString(" ", withString: "_", options: NSStringCompareOptions(rawValue: 0), range: nil)
     let selector = Selector(selectorName)
-    let method = class_getInstanceMethod(self, "example") // No @encode in swift, creating a dummy method to get encoding
+    let method = class_getInstanceMethod(self, #selector(URITemplateCasesTests.example)) // No @encode in swift, creating a dummy method to get encoding
     let types = method_getTypeEncoding(method)
     let added = class_addMethod(self, selector, imp, types)
     assert(added, "Failed to add `\(name)` as `\(selector)`")
