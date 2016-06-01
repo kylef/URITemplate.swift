@@ -259,7 +259,11 @@ extension NSRegularExpression {
 
 extension String {
   func percentEncoded() -> String {
-    let allowedCharacters = NSCharacterSet(charactersInString: ":/?&=;+!@#$()',* ").invertedSet
+    // Percent encoding confirming to RFC3986
+    let unreserved = "-._~/?"
+    let allowedCharacters = NSMutableCharacterSet.alphanumericCharacterSet()
+    allowedCharacters.addCharactersInString(unreserved)
+		
     return stringByAddingPercentEncodingWithAllowedCharacters(allowedCharacters)!
   }
 }
