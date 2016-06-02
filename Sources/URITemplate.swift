@@ -259,12 +259,7 @@ extension NSRegularExpression {
 
 extension String {
   func percentEncoded() -> String {
-    // Percent encoding confirming to RFC3986
-    let unreserved = "-._~/?"
-    let allowedCharacters = NSMutableCharacterSet.alphanumericCharacterSet()
-    allowedCharacters.addCharactersInString(unreserved)
-
-    return stringByAddingPercentEncodingWithAllowedCharacters(allowedCharacters)!
+    return CFURLCreateStringByAddingPercentEscapes(nil, self, nil, ":/?&=;+!@#$()',*", CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding)) as String
   }
 }
 
@@ -362,7 +357,7 @@ class ReservedExpansion : BaseOperator, Operator {
   override var joiner:String { return "," }
 
   override func expand(value  value:String) -> String {
-    return value.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!
+    return value.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
   }
 }
 
@@ -373,7 +368,7 @@ class FragmentExpansion : BaseOperator, Operator {
   override var joiner:String { return "," }
 
   override func expand(value  value:String) -> String {
-    return value.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLFragmentAllowedCharacterSet())!
+    return value.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
   }
 }
 
@@ -403,7 +398,7 @@ class PathSegmentExpansion : BaseOperator, Operator {
   override var joiner:String { return "/" }
 
   override func expand(value  value:String) -> String {
-    return value.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLPathAllowedCharacterSet())!
+    return value.percentEncoded()
   }
 
   override func expand(variable  variable:String, value:[AnyObject], explode:Bool) -> String? {

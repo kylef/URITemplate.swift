@@ -26,7 +26,7 @@ let testCases: (ContextType -> Void) = {
           let expansionDescribe = (supportedExpansionLevel >= suite.level) ? $0.describe : $0.xdescribe
           expansionDescribe("expansion") {
             for (index, testcase) in suite.cases.enumerate() {
-              $0.xit("can expand case \(index + 1) (\(testcase.uriTemplate))") {
+              $0.it("can expand case \(index + 1) (\(testcase.uriTemplate))") {
                 let expanded = testcase.uriTemplate.expand(suite.variables)
                 try expect(testcase.expected.contains(expanded)).to.beTrue()
               }
