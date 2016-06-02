@@ -1,93 +1,87 @@
-//
-//  URITemplateExpansionTests.swift
-//  URITemplate
-//
-//  Created by Kyle Fuller on 26/11/2014.
-//  Copyright (c) 2014 Kyle Fuller. All rights reserved.
-//
-
-import Foundation
-import XCTest
+import Spectre
 import URITemplate
 
-class URITemplateExpansionTests: XCTestCase {
-  func testBasicStringExpansion() {
+
+let testExpansion: (ContextType -> Void) = {
+  $0.it("can expand basic template") {
     let template = URITemplate(template:"{name}")
     let expanded = template.expand(["name": "Kyle's"])
-    XCTAssertEqual(expanded, "Kyle%27s")
+    try expect(expanded) == "Kyle%27s"
   }
 
-  func testReservedExpansion() {
+  $0.it("can expand reserve extensions") {
     let template = URITemplate(template:"{+path}/here")
     let expanded = template.expand(["path": "/its"])
-    XCTAssertEqual(expanded, "/its/here")
+    try expect(expanded) == "/its/here"
   }
 
-  func testFragmentExpansion() {
+  $0.it("can expand fragments") {
     let template = URITemplate(template:"{#value}")
     let expanded = template.expand(["value": "Hello World!"])
-    XCTAssertEqual(expanded, "#Hello%20World!")
+    try expect(expanded) == "#Hello%20World!"
   }
 
-  func testLabelExpansion() {
+  $0.it("can expand labels") {
     let template = URITemplate(template:"{.who}")
     let expanded = template.expand(["who": "kyle"])
-    XCTAssertEqual(expanded, ".kyle")
+    try expect(expanded) == ".kyle"
   }
 
-  func testPathStyleParameterExpansion() {
+  $0.it("can expand path style parameters") {
     let template = URITemplate(template:"{;who}")
     let expanded = template.expand(["who": "kyle"])
-    XCTAssertEqual(expanded, ";who=kyle")
+    try expect(expanded) == ";who=kyle"
   }
 
-  func testFormStyleQueryExpansion() {
+  $0.it("can expand form style query") {
     let template = URITemplate(template:"{?who}")
     let expanded = template.expand(["who": "kyle"])
-    XCTAssertEqual(expanded, "?who=kyle")
+    try expect(expanded) == "?who=kyle"
   }
 
-  func testFormStyleQueryContinuationExpansion() {
+  $0.it("can expand form style query continuation") {
     let template = URITemplate(template:"{&who}")
     let expanded = template.expand(["who": "kyle"])
-    XCTAssertEqual(expanded, "&who=kyle")
+    try expect(expanded) == "&who=kyle"
   }
 
-  // MARK:
-
-  func testPrefixExpansionTruncatesLength() {
+  $0.it("truncates length during prefix expansion") {
     let template = URITemplate(template:"{name:1}")
     let expanded = template.expand(["name": "Kyle's"])
-    XCTAssertEqual(expanded, "K")
+    try expect(expanded) == "K"
   }
 
-  func testBasicArrayJoiningExpansion() {
-    let template = URITemplate(template:"{names}")
-    let expanded = template.expand(["names": ["Kyle", "Katie"]])
-    XCTAssertEqual(expanded, "Kyle,Katie")
+  $0.describe("array joining") {
+    $0.it("can join basic array") {
+      let template = URITemplate(template:"{names}")
+      let expanded = template.expand(["names": ["Kyle", "Katie"]])
+      try expect(expanded) == "Kyle,Katie"
+    }
+
+    $0.it("can join exploded array") {
+      let template = URITemplate(template:"{.names*}")
+      let expanded = template.expand(["names": ["Kyle", "Maxine"]])
+      try expect(expanded) == ".Kyle.Maxine"
+    }
   }
 
-  func testExplodedArrayJoiningExpansion() {
-    let template = URITemplate(template:"{.names*}")
-    let expanded = template.expand(["names": ["Kyle", "Maxine"]])
-    XCTAssertEqual(expanded, ".Kyle.Maxine")
-  }
+  $0.describe("URL Encoding") {
+    $0.it("encodes spaces") {
+      let template = URITemplate(template:"{?postal}")
+      let expanded = template.expand(["postal": "V3N 2R2"])
+      try expect(expanded) == "?postal=V3N%202R2"
+    }
 
-  func testURLEncodedSpaces() {
-    let template = URITemplate(template:"{?postal}")
-    let expanded = template.expand(["postal": "V3N 2R2"])
-    XCTAssertEqual(expanded, "?postal=V3N%202R2")
-  }
+    $0.it("encodes quotes") {
+      let template = URITemplate(template:"{?test}")
+      let expanded = template.expand(["test": "\"V3N\""])
+      try expect(expanded) == "?test=%22V3N%22"
+    }
 
-  func testURLEncodedQuotes() {
-    let template = URITemplate(template:"{?test}")
-    let expanded = template.expand(["test": "\"V3N\""])
-    XCTAssertEqual(expanded, "?test=%22V3N%22")
-  }
-
-  func testURLEncodedCarrot() {
-    let template = URITemplate(template:"{?test}")
-    let expanded = template.expand(["test": "V3N^2R2"])
-    XCTAssertEqual(expanded, "?test=V3N%5E2R2")
+    $0.it("encodes carrots") {
+      let template = URITemplate(template:"{?test}")
+      let expanded = template.expand(["test": "V3N^2R2"])
+      try expect(expanded) == "?test=V3N%5E2R2"
+    }
   }
 }

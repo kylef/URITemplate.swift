@@ -1,44 +1,10 @@
-//
-//  URITemplateCases.swift
-//  URITemplate
-//
-//  Created by Kyle Fuller on 26/11/2014.
-//  Copyright (c) 2014 Kyle Fuller. All rights reserved.
-//
-
 import Foundation
-import XCTest
+import Spectre
+import PathKit
 import URITemplate
 
-// MARK: Tests
 
-func testExpansion(suite:Suite, testcase:Case) {
-//  let expanded = testcase.uriTemplate.expand(suite.variables)
-//  XCTAssertTrue(testcase.expected.contains(expanded.characters), "\(testcase.template). \(testcase.expected[0]) !~ \(expanded)")
-}
-
-func testExtraction(suite:Suite, testcase:Case) {
-  let template = testcase.uriTemplate
-
-  for uri in testcase.expected {
-    if let variables = template.extract(uri) {
-      var expectedVariables = Dictionary<String, String>()
-      for variable in template.variables {
-        if let value:AnyObject = variables[variable] as AnyObject? {
-          expectedVariables[variable] = "\(value)"
-        } else {
-          XCTAssert(false, "Missing Variable \(variable) from `\(uri)` with template `\(template)`")
-        }
-      }
-
-      XCTAssertEqual(variables as NSDictionary, expectedVariables as NSDictionary, "\(template)")
-    } else {
-      XCTFail("Extracted no match template: \(template) with uri: \(uri)")
-    }
-  }
-}
-
-class URITemplateCasesTests : DynamicTestCase {
+let testCases: (ContextType -> Void) = {
   let files = [
     "extended-tests",
     "spec-examples-by-section",
@@ -48,56 +14,56 @@ class URITemplateCasesTests : DynamicTestCase {
   let supportedExpansionLevel = 4
   let supportedExtractionLevel = 3
 
-  override class func testSelectors() -> [String] {
-    let tests = URITemplateCasesTests()
-    var invocations = [String]()
+  for file in files {
+    $0.describe("Test Case File \(file)") {
+      let path = Path(#file) + ".." + "Cases" + "\(file).json"
+      let content = try! NSJSONSerialization.JSONObjectWithData(try! path.read(), options: NSJSONReadingOptions(rawValue: 0)) as! [String: AnyObject]
+      let suites = content
+        .map { Suite(name: $0.0, testSuite: $0.1 as! [String: AnyObject]) }
 
-    for suite in tests.suites() {
-      for (index, testcase) in suite.cases.enumerate() {
-        if tests.supportedExpansionLevel >= suite.level {
-          invocations.append(addTest("\(suite.name) Case \(index) Expansion") {
-            testExpansion(suite, testcase: testcase)
-          })
-        }
+      for suite in suites {
+        $0.describe("Suite \(suite.name)") {
+          let expansionDescribe = (supportedExpansionLevel >= suite.level) ? $0.describe : $0.xdescribe
+          expansionDescribe("expansion") {
+            for (index, testcase) in suite.cases.enumerate() {
+              $0.xit("can expand case \(index + 1) (\(testcase.uriTemplate))") {
+                let expanded = testcase.uriTemplate.expand(suite.variables)
+                try expect(testcase.expected.contains(expanded)).to.beTrue()
+              }
+            }
+          }
 
-        if tests.supportedExtractionLevel >= suite.level {
-          invocations.append(addTest("\(suite.name) Case \(index) Extraction") {
-            testExtraction(suite, testcase: testcase)
-          })
+          let extractionDescribe = (supportedExpansionLevel >= suite.level) ? $0.describe : $0.xdescribe
+          extractionDescribe("extraction") {
+            for (index, testcase) in suite.cases.enumerate() {
+              $0.describe("can extract case \(index + 1) (\(testcase.uriTemplate))") {
+                let template = testcase.uriTemplate
+
+                for (index, uri) in testcase.expected.enumerate() {
+                  $0.it("URI \(index + 1)") {
+                    if let variables = template.extract(uri) {
+                      var expectedVariables: [String: String] = [:]
+
+                      for variable in template.variables {
+                        if let value:AnyObject = variables[variable] as AnyObject? {
+                          expectedVariables[variable] = "\(value)"
+                        } else {
+                          try failure("Missing Variable \(variable) from `\(uri)` with template `\(template)`")
+                        }
+                      }
+
+                      try expect(variables as NSDictionary) == expectedVariables as NSDictionary
+                    } else {
+                      try failure("Extracted no match template: \(template) with uri: \(uri)")
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
-
-    return invocations
-  }
-
-  class func addTest(name:String, closure:() -> ()) -> String {
-    let block : @convention(block) (AnyObject!) -> () = { (instance : AnyObject!) -> () in
-      closure()
-    }
-
-    let imp = imp_implementationWithBlock(unsafeBitCast(block, AnyObject.self))
-    let selectorName = name.stringByReplacingOccurrencesOfString(" ", withString: "_", options: NSStringCompareOptions(rawValue: 0), range: nil)
-    let selector = Selector(selectorName)
-    let method = class_getInstanceMethod(self, #selector(URITemplateCasesTests.example)) // No @encode in swift, creating a dummy method to get encoding
-    let types = method_getTypeEncoding(method)
-    let added = class_addMethod(self, selector, imp, types)
-    assert(added, "Failed to add `\(name)` as `\(selector)`")
-
-    return selectorName
-  }
-
-  func example() { /* See addTest() */ }
-
-  // MARK:
-
-  func suites() -> [Suite] {
-    let bundle = NSBundle(forClass:object_getClass(self))
-    let urls = files.map { file -> NSURL in
-      bundle.URLForResource(file, withExtension: "json")!
-    }
-
-    return loadSuites(urls)
   }
 }
 
@@ -139,33 +105,4 @@ struct Case {
   var uriTemplate:URITemplate {
     return URITemplate(template:template)
   }
-}
-
-// MARK: Loading suite methods
-
-func loadFixture(URL:NSURL) -> Dictionary<String, AnyObject> {
-  let data = NSData(contentsOfURL: URL)!
-  let object: AnyObject?
-
-  do {
-    object = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(rawValue: 0))
-  } catch let error as NSError {
-    fatalError("\(error)")
-  }
-
-  return object as! Dictionary<String, AnyObject>
-}
-
-func loadSuites(urls:[NSURL]) -> [Suite] {
-  var suites = [Suite]()
-
-  for url in urls {
-    for (key, value) in loadFixture(url) {
-      if let testsuite = value as? Dictionary<String, AnyObject> {
-        suites.append(Suite(name:key, testSuite:testsuite))
-      }
-    }
-  }
-
-  return suites
 }

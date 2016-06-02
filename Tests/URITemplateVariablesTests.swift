@@ -1,70 +1,60 @@
-//
-//  URITemplateVariablesTests.swift
-//  URITemplate
-//
-//  Created by Kyle Fuller on 26/11/2014.
-//  Copyright (c) 2014 Kyle Fuller. All rights reserved.
-//
-
-import Foundation
-import XCTest
+import Spectre
 import URITemplate
 
-// MARK: Variables
 
-class URITemplateVariablesTests : XCTestCase {
-  func testVariables() {
+let testVariables: (ContextType -> Void) = {
+  $0.it("can extract variables") {
     let template = URITemplate(template:"{scheme}://{hostname}/")
-    XCTAssertEqual(template.variables, ["scheme", "hostname"])
+    try expect(template.variables) == ["scheme", "hostname"]
   }
 
-  func testMultipleVariablesInExpression() {
+  $0.it("can extract multiple variables in an expression") {
     let template = URITemplate(template:"test/{a,b}")
-    XCTAssertEqual(template.variables, ["a", "b"])
+    try expect(template.variables) == ["a", "b"]
   }
 
-  func testReservedVariablesInExpression() {
+  $0.it("can extract reserved variables in an expression") {
     let template = URITemplate(template:"test/{+reserved}")
-    XCTAssertEqual(template.variables, ["reserved"])
+    try expect(template.variables) == ["reserved"]
   }
 
-  func testLabelVariablesInExpression() {
+  $0.it("can extract label variables in an expression") {
     let template = URITemplate(template:"test/{.label}")
-    XCTAssertEqual(template.variables, ["label"])
+    try expect(template.variables) == ["label"]
   }
 
-  func testFragmentVariablesInExpression() {
+  $0.it("can extract fragment variables in an expression") {
     let template = URITemplate(template:"test/{#fragment}")
-    XCTAssertEqual(template.variables, ["fragment"])
+    try expect(template.variables) == ["fragment"]
   }
 
-  func testPathSegmentVariablesInExpression() {
+  $0.it("can extract segment variables in an expression") {
     let template = URITemplate(template:"test/{/segment}")
-    XCTAssertEqual(template.variables, ["segment"])
+    try expect(template.variables) == ["segment"]
   }
 
-  func testPathParameterVariablesInExpression() {
+  $0.it("can extract parameter variables in an expression") {
     let template = URITemplate(template:"test/{;parameter}")
-    XCTAssertEqual(template.variables, ["parameter"])
+    try expect(template.variables) == ["parameter"]
   }
 
-  func testFormStyleQueryVariablesInExpression() {
+  $0.it("can form style query variables in an expression") {
     let template = URITemplate(template:"test/{?query}")
-    XCTAssertEqual(template.variables, ["query"])
+    try expect(template.variables) == ["query"]
   }
 
-  func testFormStyleQueryContinuationVariablesInExpression() {
+  $0.it("can extract form style query continuation variables in an expression") {
     let template = URITemplate(template:"test/{&continuation}")
-    XCTAssertEqual(template.variables, ["continuation"])
+    try expect(template.variables) == ["continuation"]
   }
 
-  func testHandlesCompositeValues() {
+  $0.it("can extract composite values") {
     let template = URITemplate(template:"{/list*}")
-    XCTAssertEqual(template.variables, ["list"])
+    try expect(template.variables) == ["list"]
   }
 
-  func testMixedQueryParameterVariables() {
+  $0.it("can extract mixed query/parameter variables") {
     let template = URITemplate(template:"{scheme}://{hostname}/endpoint.json{?query,list*}")
-    XCTAssert(template.variables.contains("hostname"))
+    try expect(template.variables.contains("hostname")).to.beTrue()
   }
 }

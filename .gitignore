@@ -25,4 +25,4 @@ DerivedData
 #
 # Pods/
 .build/
-Package/
+Packages/

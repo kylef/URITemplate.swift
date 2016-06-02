@@ -1,40 +1,32 @@
-//
-//  URITemplateExtractTests.swift
-//  URITemplate
-//
-//  Created by Kyle Fuller on 26/11/2014.
-//  Copyright (c) 2014 Kyle Fuller. All rights reserved.
-//
-
-import Foundation
-import XCTest
+import Spectre
 import URITemplate
 
-class URITemplateExtractTests: XCTestCase {
-  func testBasicStringExtract() {
-    let template = URITemplate(template:"{variable}")
+
+let testExtract: (ContextType -> Void) = {
+  $0.it("can extract a basic variable") {
+    let template = URITemplate(template: "{variable}")
     let values = template.extract("value")
 
-    XCTAssertEqual(values!, ["variable": "value"])
+    try expect(values) == ["variable": "value"]
   }
 
-  func testHandlesCompositeValues() {
-    let template = URITemplate(template:"https://api.github.com/repos/{owner}/{repo}/")
-    XCTAssertEqual(template.extract("https://api.github.com/repos/kylef/PathKit/")!, ["owner":"kylef", "repo":"PathKit"])
+  $0.it("handles composite values") {
+    let template = URITemplate(template: "https://api.github.com/repos/{owner}/{repo}/")
+    try expect(template.extract("https://api.github.com/repos/kylef/PathKit/")) == ["owner":"kylef", "repo":"PathKit"]
   }
 
-  func testMatchWithoutVariables() {
+  $0.it("matches without variables") {
     let template = URITemplate(template:"https://api.github.com/repos/kylef/URITemplate")
-    XCTAssertEqual(template.extract("https://api.github.com/repos/kylef/URITemplate")!.count, 0)
+    try expect(template.extract("https://api.github.com/repos/kylef/URITemplate")?.count) == 0
   }
 
-  func testNoVariablesNoMatch() {
+  $0.it("doesn't match with different URL without variables") {
     let template = URITemplate(template:"https://api.github.com/repos/kylef/URITemplate")
-    XCTAssertNil(template.extract("https://api.github.com/repos/kylef/PatkKit"))
+    try expect(template.extract("https://api.github.com/repos/kylef/PatkKit")).to.beNil()
   }
 
-  func testVariablesNoMatch() {
+  $0.it("doesn't match with different URL with variables") {
     let template = URITemplate(template:"https://api.github.com/repos/{owner}")
-    XCTAssertNil(template.extract("https://api.github.com/repos/kylef/WebLinking"))
+    try expect(template.extract("https://api.github.com/repos/kylef/WebLinking")).to.beNil()
   }
 }

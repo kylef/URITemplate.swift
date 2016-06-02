@@ -263,7 +263,7 @@ extension String {
     let unreserved = "-._~/?"
     let allowedCharacters = NSMutableCharacterSet.alphanumericCharacterSet()
     allowedCharacters.addCharactersInString(unreserved)
-		
+
     return stringByAddingPercentEncodingWithAllowedCharacters(allowedCharacters)!
   }
 }

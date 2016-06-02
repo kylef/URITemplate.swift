@@ -7,10 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2771CF271B9F54A200F1A11F /* DynamicTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 2771CF261B9F54A200F1A11F /* DynamicTestCase.m */; };
 		77356D861A253325002822CF /* URITemplate.h in Headers */ = {isa = PBXBuildFile; fileRef = 77356D851A253325002822CF /* URITemplate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		77356D8C1A253325002822CF /* URITemplate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77356D801A253325002822CF /* URITemplate.framework */; };
-		77356D931A253325002822CF /* URITemplateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77356D921A253325002822CF /* URITemplateTests.swift */; };
+		77356D931A253325002822CF /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77356D921A253325002822CF /* main.swift */; };
 		77356D9D1A2534BE002822CF /* URITemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77356D9C1A2534BE002822CF /* URITemplate.swift */; };
 		77356DA61A254642002822CF /* extended-tests.json in Resources */ = {isa = PBXBuildFile; fileRef = 77356D9F1A254642002822CF /* extended-tests.json */; };
 		77356DA81A254642002822CF /* negative-tests.json in Resources */ = {isa = PBXBuildFile; fileRef = 77356DA11A254642002822CF /* negative-tests.json */; };
@@ -36,15 +35,12 @@
 		2761AB841A42478200093A2F /* UniversalFramework_Base.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = UniversalFramework_Base.xcconfig; sourceTree = "<group>"; };
 		2761AB851A42478200093A2F /* UniversalFramework_Framework.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = UniversalFramework_Framework.xcconfig; sourceTree = "<group>"; };
 		2761AB861A42478200093A2F /* UniversalFramework_Test.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = UniversalFramework_Test.xcconfig; sourceTree = "<group>"; };
-		2771CF241B9F54A100F1A11F /* URITemplateTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "URITemplateTests-Bridging-Header.h"; sourceTree = "<group>"; };
-		2771CF251B9F54A200F1A11F /* DynamicTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DynamicTestCase.h; sourceTree = "<group>"; };
-		2771CF261B9F54A200F1A11F /* DynamicTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DynamicTestCase.m; sourceTree = "<group>"; };
 		77356D801A253325002822CF /* URITemplate.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = URITemplate.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		77356D841A253325002822CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		77356D851A253325002822CF /* URITemplate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = URITemplate.h; sourceTree = "<group>"; };
 		77356D8B1A253325002822CF /* URITemplateTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = URITemplateTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		77356D911A253325002822CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		77356D921A253325002822CF /* URITemplateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URITemplateTests.swift; sourceTree = "<group>"; };
+		77356D921A253325002822CF /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		77356D9C1A2534BE002822CF /* URITemplate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URITemplate.swift; sourceTree = "<group>"; };
 		77356D9F1A254642002822CF /* extended-tests.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "extended-tests.json"; sourceTree = "<group>"; };
 		77356DA11A254642002822CF /* negative-tests.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "negative-tests.json"; sourceTree = "<group>"; };
@@ -128,16 +124,13 @@
 		77356D8F1A253325002822CF /* URITemplateTests */ = {
 			isa = PBXGroup;
 			children = (
-				77356D921A253325002822CF /* URITemplateTests.swift */,
+				77356D921A253325002822CF /* main.swift */,
 				77356DB11A255A7E002822CF /* URITemplateExpansionTests.swift */,
 				77356DAF1A255A40002822CF /* URITemplateVariablesTests.swift */,
 				779F8C711A262A6800F7C9DF /* URITemplateExtractTests.swift */,
 				77356DAD1A254673002822CF /* URITemplateCases.swift */,
-				2771CF251B9F54A200F1A11F /* DynamicTestCase.h */,
-				2771CF261B9F54A200F1A11F /* DynamicTestCase.m */,
 				77356D9E1A254642002822CF /* Cases */,
 				77356D901A253325002822CF /* Supporting Files */,
-				2771CF241B9F54A100F1A11F /* URITemplateTests-Bridging-Header.h */,
 			);
 			name = URITemplateTests;
 			path = Tests;
@@ -283,11 +276,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				77356DB01A255A40002822CF /* URITemplateVariablesTests.swift in Sources */,
-				2771CF271B9F54A200F1A11F /* DynamicTestCase.m in Sources */,
 				77356DAE1A254673002822CF /* URITemplateCases.swift in Sources */,
 				779F8C721A262A6800F7C9DF /* URITemplateExtractTests.swift in Sources */,
 				77356DB21A255A7E002822CF /* URITemplateExpansionTests.swift in Sources */,
-				77356D931A253325002822CF /* URITemplateTests.swift in Sources */,
+				77356D931A253325002822CF /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
