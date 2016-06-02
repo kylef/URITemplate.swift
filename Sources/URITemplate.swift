@@ -193,7 +193,7 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, String
     }
 
     do {
-      return try NSRegularExpression(pattern: "^\(pattern)$", options: NSRegularExpressionOptions(rawValue: 0))
+      return try NSRegularExpression(pattern: "\(pattern)$", options: NSRegularExpressionOptions(rawValue: 0))
     } catch _ {
       return nil
     }
