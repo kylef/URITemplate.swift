@@ -1,0 +1,3 @@
+import URITemplateTests
+
+testURITemplate()

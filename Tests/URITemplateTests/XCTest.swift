@@ -4,7 +4,7 @@ import Spectre
 import URITemplate
 
 
-func testURITemplate() {
+public func testURITemplate() {
   describe("URI Template") {
     $0.it("exposes the template as a property") {
       let uri = URITemplate(template:"{scheme}://{hostname}/")
