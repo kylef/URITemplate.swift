@@ -2,7 +2,7 @@ import Spectre
 import URITemplate
 
 
-let testExtract: (ContextType -> Void) = {
+let testExtract: ((ContextType) -> Void) = {
   $0.it("can extract a basic variable") {
     let template = URITemplate(template: "{variable}")
     let values = template.extract("value")

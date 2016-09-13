@@ -2,7 +2,7 @@ import Spectre
 import URITemplate
 
 
-let testExpansion: (ContextType -> Void) = {
+let testExpansion: ((ContextType) -> Void) = {
   $0.it("can expand basic template") {
     let template = URITemplate(template:"{name}")
     let expanded = template.expand(["name": "Kyle's"])
