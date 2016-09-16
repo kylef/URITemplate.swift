@@ -4,7 +4,7 @@ import PathKit
 import URITemplate
 
 
-let testCases: (ContextType -> Void) = {
+let testCases: ((ContextType) -> Void) = {
   let files = [
     "extended-tests",
     "spec-examples-by-section",
@@ -17,7 +17,7 @@ let testCases: (ContextType -> Void) = {
   for file in files {
     $0.describe("Test Case File \(file)") {
       let path = Path(#file) + ".." + "Cases" + "\(file).json"
-      let content = try! NSJSONSerialization.JSONObjectWithData(try! path.read(), options: NSJSONReadingOptions(rawValue: 0)) as! [String: AnyObject]
+      let content = try! JSONSerialization.jsonObject(with: try! path.read(), options: []) as! [String: AnyObject]
       let suites = content
         .map { Suite(name: $0.0, testSuite: $0.1 as! [String: AnyObject]) }
 
@@ -25,7 +25,7 @@ let testCases: (ContextType -> Void) = {
         $0.describe("Suite \(suite.name)") {
           let expansionDescribe = (supportedExpansionLevel >= suite.level) ? $0.describe : $0.xdescribe
           expansionDescribe("expansion") {
-            for (index, testcase) in suite.cases.enumerate() {
+            for (index, testcase) in suite.cases.enumerated() {
               $0.it("can expand case \(index + 1) (\(testcase.uriTemplate))") {
                 let expanded = testcase.uriTemplate.expand(suite.variables)
                 try expect(testcase.expected.contains(expanded)).to.beTrue()
@@ -33,13 +33,13 @@ let testCases: (ContextType -> Void) = {
             }
           }
 
-          let extractionDescribe = (supportedExpansionLevel >= suite.level) ? $0.describe : $0.xdescribe
+          let extractionDescribe = (supportedExtractionLevel >= suite.level) ? $0.describe : $0.xdescribe
           extractionDescribe("extraction") {
-            for (index, testcase) in suite.cases.enumerate() {
+            for (index, testcase) in suite.cases.enumerated() {
               $0.describe("can extract case \(index + 1) (\(testcase.uriTemplate))") {
                 let template = testcase.uriTemplate
 
-                for (index, uri) in testcase.expected.enumerate() {
+                for (index, uri) in testcase.expected.enumerated() {
                   $0.it("URI \(index + 1)") {
                     if let variables = template.extract(uri) {
                       var expectedVariables: [String: String] = [:]
@@ -48,13 +48,13 @@ let testCases: (ContextType -> Void) = {
                         if let value:AnyObject = variables[variable] as AnyObject? {
                           expectedVariables[variable] = "\(value)"
                         } else {
-                          try failure("Missing Variable \(variable) from `\(uri)` with template `\(template)`")
+                          throw failure("Missing Variable \(variable) from `\(uri)` with template `\(template)`")
                         }
                       }
 
                       try expect(variables as NSDictionary) == expectedVariables as NSDictionary
                     } else {
-                      try failure("Extracted no match template: \(template) with uri: \(uri)")
+                      throw failure("Extracted no match template: \(template) with uri: \(uri)")
                     }
                   }
                 }

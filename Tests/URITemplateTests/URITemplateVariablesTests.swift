@@ -2,7 +2,7 @@ import Spectre
 import URITemplate
 
 
-let testVariables: (ContextType -> Void) = {
+let testVariables: ((ContextType) -> Void) = {
   $0.it("can extract variables") {
     let template = URITemplate(template:"{scheme}://{hostname}/")
     try expect(template.variables) == ["scheme", "hostname"]
