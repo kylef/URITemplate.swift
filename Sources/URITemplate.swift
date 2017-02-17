@@ -259,7 +259,7 @@ extension NSRegularExpression {
 
 extension String {
   func percentEncoded() -> String {
-    return CFURLCreateStringByAddingPercentEscapes(nil, self as CFString!, nil, ":/?&=;+!@#$()',*" as CFString!, CFStringConvertNSStringEncodingToEncoding(String.Encoding.utf8.rawValue)) as String
+    return addingPercentEncoding(withAllowedCharacters: CharacterSet.URITemplate.unreserved)!
   }
 }
 
@@ -357,7 +357,7 @@ class ReservedExpansion : BaseOperator, Operator {
   override var joiner:String { return "," }
 
   override func expand(value:String) -> String {
-    return value.addingPercentEscapes(using: String.Encoding.utf8)!
+    return value.addingPercentEncoding(withAllowedCharacters: CharacterSet.uriTemplateReservedAllowed)!
   }
 }
 
@@ -368,7 +368,7 @@ class FragmentExpansion : BaseOperator, Operator {
   override var joiner:String { return "," }
 
   override func expand(value:String) -> String {
-    return value.addingPercentEscapes(using: String.Encoding.utf8)!
+    return value.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlFragmentAllowed)!
   }
 }
 
@@ -562,4 +562,31 @@ class FormStyleQueryContinuation : BaseOperator, Operator {
 
     return expandedValue
   }
+}
+
+private extension CharacterSet {
+  struct URITemplate {
+    static let digits = CharacterSet(charactersIn: "0"..."9")
+    static let genDelims = CharacterSet(charactersIn: ":/?#[]@")
+    static let subDelims = CharacterSet(charactersIn: "!$&'()*+,;=")
+    static let unreservedSymbols = CharacterSet(charactersIn: "-._~")
+
+    static let unreserved = {
+      return alpha.union(digits).union(unreservedSymbols)
+    }()
+
+    static let reserved = {
+      return genDelims.union(subDelims)
+    }()
+
+    static let alpha = { () -> CharacterSet in
+      let upperAlpha = CharacterSet(charactersIn: "A"..."Z")
+      let lowerAlpha = CharacterSet(charactersIn: "a"..."z")
+      return upperAlpha.union(lowerAlpha)
+    }()
+  }
+
+  static let uriTemplateReservedAllowed = {
+    return URITemplate.unreserved.union(URITemplate.reserved)
+  }()
 }
