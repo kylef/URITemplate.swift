@@ -210,11 +210,11 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
         var extractedVariables:[String: String] = [:]
 
         for (index, variable) in variables.enumerated() {
-			#if swift(>=4.0)
-				let range = result.range(at: index + 1)
-			#else
-				let range = result.rangeAt(index + 1)
-			#endif
+#if swift(>=4.0)
+          let range = result.range(at: index + 1)
+#else
+          let range = result.rangeAt(index + 1)
+#endif
           let value = NSString(string: input.substring(with: range)).removingPercentEncoding
           extractedVariables[variable] = value
         }
