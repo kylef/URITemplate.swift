@@ -1,6 +1,6 @@
 # Changelog for URITemplate
 
-## Master
+## 2.0.2
 
 ### Enhancements
 
