@@ -68,9 +68,13 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
 
   /// Returns the set of keywords in the URI Template
   public var variables: [String] {
-    let expressions = regex.matches(template).map { expression in
+    let expressions = regex.matches(template).map { expression -> String in
       // Removes the { and } from the expression
-      expression.substring(with: expression.characters.index(after: expression.startIndex)..<expression.characters.index(before: expression.endIndex))
+#if swift(>=4.0)
+      return String(expression[expression.characters.index(after: expression.startIndex)..<expression.characters.index(before: expression.endIndex)])
+#else
+      return expression.substring(with: expression.characters.index(after: expression.startIndex)..<expression.characters.index(before: expression.endIndex))
+#endif
     }
 
     return expressions.map { expression -> [String] in
@@ -79,7 +83,11 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
       for op in self.operators {
         if let op = op.op {
           if expression.hasPrefix(op) {
+#if swift(>=4.0)
+            expression = String(expression[expression.characters.index(after: expression.startIndex)...])
+#else
             expression = expression.substring(from: expression.characters.index(after: expression.startIndex))
+#endif
             break
           }
         }
@@ -87,7 +95,11 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
 
       return expression.components(separatedBy: ",").map { component in
         if component.hasSuffix("*") {
+#if swift(>=4.0)
+          return String(component[..<component.characters.index(before: component.endIndex)])
+#else
           return component.substring(to: component.characters.index(before: component.endIndex))
+#endif
         } else {
           return component
         }
@@ -98,8 +110,13 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
   /// Expand template as a URI Template using the given variables
   public func expand(_ variables: [String: Any]) -> String {
     return regex.substitute(template) { string in
+#if swift(>=4.0)
+      var expression = String(string[string.characters.index(after: string.startIndex)..<string.characters.index(before: string.endIndex)])
+      let firstCharacter = String(expression[..<expression.characters.index(after: expression.startIndex)])
+#else
       var expression = string.substring(with: string.characters.index(after: string.startIndex)..<string.characters.index(before: string.endIndex))
       let firstCharacter = expression.substring(to: expression.characters.index(after: expression.startIndex))
+#endif
 
       var op = self.operators.filter {
         if let op = $0.op {
@@ -110,7 +127,11 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
       }.first
 
       if (op != nil) {
+#if swift(>=4.0)
+        expression = String(expression[expression.characters.index(after: expression.startIndex)...])
+#else
         expression = expression.substring(from: expression.characters.index(after: expression.startIndex))
+#endif
       } else {
         op = self.operators.first
       }
@@ -120,14 +141,23 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
         var prefix:Int?
 
         if let range = variable.range(of: ":") {
+#if swift(>=4.0)
+          prefix = Int(String(variable[range.upperBound...]))
+          variable = String(variable[..<range.lowerBound])
+#else
           prefix = Int(variable.substring(from: range.upperBound))
           variable = variable.substring(to: range.lowerBound)
+#endif
         }
 
         let explode = variable.hasSuffix("*")
 
         if explode {
+#if swift(>=4.0)
+          variable = String(variable[..<variable.characters.index(before: variable.endIndex)])
+#else
           variable = variable.substring(to: variable.characters.index(before: variable.endIndex))
+#endif
         }
 
         if let value: Any = variables[variable] {
@@ -169,7 +199,11 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
     }.first
 
     if op != nil {
+#if swift(>=4.0)
+      expression = String(expression[expression.characters.index(after: expression.startIndex)..<expression.endIndex])
+#else
       expression = expression.substring(with: expression.characters.index(after: expression.startIndex)..<expression.endIndex)
+#endif
     }
 
     let regexes = expression.components(separatedBy: ",").map { variable -> String in
@@ -186,7 +220,11 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
       if expression.hasPrefix("{") && expression.hasSuffix("}") {
         let startIndex = expression.characters.index(after: expression.startIndex)
         let endIndex = expression.characters.index(before: expression.endIndex)
+#if swift(>=4.0)
+        return self.regexForExpression(String(expression[startIndex..<endIndex]))
+#else
         return self.regexForExpression(expression.substring(with: startIndex..<endIndex))
+#endif
       } else {
         return NSRegularExpression.escapedPattern(for: expression)
       }
@@ -311,7 +349,11 @@ class BaseOperator {
     if let prefix = prefix {
       if value.characters.count > prefix {
         let index = value.characters.index(value.startIndex, offsetBy: prefix, limitedBy: value.endIndex)
+#if swift(>=4.0)
+        return expand(value: String(value[..<index!]))
+#else
         return expand(value: value.substring(to: index!))
+#endif
       }
     }
 
