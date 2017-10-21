@@ -1,5 +1,11 @@
 # Changelog for URITemplate
 
+## 2.0.3
+
+### Bug Fixes
+
+- Prevents using deprecated APIs when building on Swift 4.
+
 ## 2.0.2
 
 ### Enhancements
