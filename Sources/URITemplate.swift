@@ -11,7 +11,7 @@ import Foundation
 // MARK: URITemplate
 
 /// A data structure to represent an RFC6570 URI template.
-public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Codable, ExpressibleByStringLiteral, ExpressibleByExtendedGraphemeClusterLiteral, ExpressibleByUnicodeScalarLiteral {
+public struct URITemplate : CustomStringConvertible, Equatable, Hashable, ExpressibleByStringLiteral, ExpressibleByExtendedGraphemeClusterLiteral, ExpressibleByUnicodeScalarLiteral {
   /// The underlying URI template
   public let template:String
 
@@ -57,14 +57,11 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Codabl
     template = value
   }
 
+#if swift(>=4.0)
   public init(from decoder: Decoder) throws {
     self.template = try decoder.singleValueContainer().decode(String.self)
   }
-
-  public func encode(to encoder: Encoder) throws {
-    var container = encoder.singleValueContainer()
-    try container.encode(template)
-  }
+#endif
 
   /// Returns a description of the URITemplate
   public var description: String {
@@ -273,6 +270,15 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Codabl
     return nil
   }
 }
+
+#if swift(>=4.0)
+extension URITemplate: Codable {
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.singleValueContainer()
+    try container.encode(template)
+  }
+}
+#endif
 
 /// Determine if two URITemplate's are equivalent
 public func ==(lhs:URITemplate, rhs:URITemplate) -> Bool {
