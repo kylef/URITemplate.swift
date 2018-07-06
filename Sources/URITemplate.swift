@@ -11,7 +11,7 @@ import Foundation
 // MARK: URITemplate
 
 /// A data structure to represent an RFC6570 URI template.
-public struct URITemplate : CustomStringConvertible, Equatable, Hashable, ExpressibleByStringLiteral, ExpressibleByExtendedGraphemeClusterLiteral, ExpressibleByUnicodeScalarLiteral {
+public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Codable, ExpressibleByStringLiteral, ExpressibleByExtendedGraphemeClusterLiteral, ExpressibleByUnicodeScalarLiteral {
   /// The underlying URI template
   public let template:String
 
@@ -55,6 +55,15 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
 
   public init(stringLiteral value: StringLiteralType) {
     template = value
+  }
+
+  public init(from decoder: Decoder) throws {
+    self.template = try decoder.singleValueContainer().decode(String.self)
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.singleValueContainer()
+    try container.encode(template)
   }
 
   /// Returns a description of the URITemplate
