@@ -43,6 +43,41 @@ public func testURITemplate() {
       try expect(literalTemplate) == template
     }
 
+#if swift(>=4.0)
+    $0.it("can be decoded from a JSON representation") {
+      // JSON adapted from https://api.github.com
+      let jsonWithTemplates = """
+      {
+        "code_search_url": "https://api.github.com/search/code?q={query}{&page,per_page,sort,order}",
+        "commit_search_url": "https://api.github.com/search/commits?q={query}{&page,per_page,sort,order}",
+        "issue_search_url": "https://api.github.com/search/issues?q={query}{&page,per_page,sort,order}",
+        "repository_search_url": "https://api.github.com/search/repositories?q={query}{&page,per_page,sort,order}",
+        "user_search_url": "https://api.github.com/search/users?q={query}{&page,per_page,sort,order}"
+      }
+      """.data(using: .utf8)!
+
+      let jsonDecoder = JSONDecoder()
+      let templateDictionary = try? jsonDecoder.decode([String: URITemplate].self, from: jsonWithTemplates)
+
+      try expect(templateDictionary != nil).to.beTrue()
+      try expect(templateDictionary!["commit_search_url"]) == URITemplate(template: "https://api.github.com/search/commits?q={query}{&page,per_page,sort,order}")
+    }
+
+    $0.it("can be encoded to and decoded from a property list") {
+      let templates = [
+        "search": URITemplate(template: "https://example.com/search?q{query}{&page,per_page}"),
+        "user": URITemplate(template: "https://example.com/users/{user_id}")
+      ]
+      let plistEncoder = PropertyListEncoder()
+      let data = try plistEncoder.encode(templates)
+
+      let plistDecoder = PropertyListDecoder()
+      let decodedTemplates = try plistDecoder.decode([String: URITemplate].self, from: data)
+
+      try expect(decodedTemplates) == templates
+    }
+#endif
+
     $0.describe("expansion", closure: testExpansion)
     $0.describe("variables", closure: testVariables)
     $0.describe("integration", closure: testCases)
