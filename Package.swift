@@ -1,10 +1,18 @@
+// swift-tools-version:4.2
+
 import PackageDescription
 
 let package = Package(
   name: "URITemplate",
-  dependencies: [
-    .Package(url: "https://github.com/kylef/Spectre", majorVersion: 0, minor: 7),
-    .Package(url: "https://github.com/kylef/PathKit", majorVersion: 0, minor: 7),
+  products: [
+    .library(name: "URITemplate", targets: ["URITemplate"])
   ],
-  swiftLanguageVersions: [3, 4]
+  dependencies: [
+    .package(url:"https://github.com/kylef/PathKit.git", .upToNextMinor(from:"1.0.0")),
+    .package(url:"https://github.com/kylef/Spectre.git", .upToNextPatch(from:"0.9.0"))
+  ],
+  targets: [
+    .target(name: "URITemplate", dependencies: [], path: "Sources"),
+    .testTarget(name: "URITemplateTests", dependencies: ["URITemplate", "PathKit", "Spectre"], path:"Tests/URITemplateTests")
+  ]
 )
