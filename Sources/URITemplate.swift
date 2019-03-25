@@ -57,6 +57,12 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
     template = value
   }
 
+#if swift(>=4.0)
+  public init(from decoder: Decoder) throws {
+    self.template = try decoder.singleValueContainer().decode(String.self)
+  }
+#endif
+
   /// Returns a description of the URITemplate
   public var description: String {
     return template
@@ -264,6 +270,15 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
     return nil
   }
 }
+
+#if swift(>=4.0)
+extension URITemplate: Codable {
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.singleValueContainer()
+    try container.encode(template)
+  }
+}
+#endif
 
 /// Determine if two URITemplate's are equivalent
 public func ==(lhs:URITemplate, rhs:URITemplate) -> Bool {
