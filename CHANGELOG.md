@@ -1,5 +1,11 @@
 # Changelog for URITemplate
 
+## Master
+
+### Breaking
+
+- Support for Swift 3 has been removed.
+
 ## 2.0.3
 
 ### Bug Fixes
