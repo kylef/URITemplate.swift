@@ -55,11 +55,11 @@ public func testURITemplate() {
           "search": URITemplate(template: "https://example.com/search?q{query}{&page,per_page}"),
           "user": URITemplate(template: "https://example.com/users/{user_id}")
         ]
-        let plistEncoder = PropertyListEncoder()
-        let plistDecoder = PropertyListDecoder()
+        let encoder = JSONEncoder()
+        let decoder = JSONDecoder()
 
-        let data = try plistEncoder.encode(templates)
-        let decodedTemplates = try plistDecoder.decode([String: URITemplate].self, from: data)
+        let data = try encoder.encode(templates)
+        let decodedTemplates = try decoder.decode([String: URITemplate].self, from: data)
 
         try expect(decodedTemplates) == templates
       }
