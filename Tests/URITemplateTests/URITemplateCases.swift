@@ -16,7 +16,8 @@ let testCases: ((ContextType) -> Void) = {
 
   for file in files {
     $0.describe("Test Case File \(file)") {
-      let path = Path(#file) + ".." + "Cases" + "\(file).json"
+      let filePath = #file
+      let path = Path(filePath) + ".." + "Cases" + "\(file).json"
       let content = try! JSONSerialization.jsonObject(with: try! path.read(), options: []) as! [String: AnyObject]
       let suites = content
         .map { Suite(name: $0.0, testSuite: $0.1 as! [String: AnyObject]) }
