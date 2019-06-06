@@ -57,11 +57,9 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
     template = value
   }
 
-#if swift(>=4.0)
   public init(from decoder: Decoder) throws {
     self.template = try decoder.singleValueContainer().decode(String.self)
   }
-#endif
 
   /// Returns a description of the URITemplate
   public var description: String {
@@ -82,13 +80,7 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
   public var variables: [String] {
     let expressions = regex.matches(template).map { expression -> String in
       // Removes the { and } from the expression
-#if swift(>=4.0)
       return String(expression[expression.index(after: expression.startIndex)..<expression.index(before: expression.endIndex)])
-#elseif swift(>=3.2)
-    return expression.substring(with: expression.index(after: expression.startIndex)..<expression.index(before: expression.endIndex))
-#else
-    return expression.substring(with: expression.index(after: expression.startIndex)..<expression.index(before: expression.endIndex))
-#endif
     }
 
     return expressions.map { expression -> [String] in
@@ -97,13 +89,7 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
       for op in self.operators {
         if let op = op.op {
           if expression.hasPrefix(op) {
-#if swift(>=4.0)
             expression = String(expression[expression.index(after: expression.startIndex)...])
-#elseif swift(>=3.2)
-            expression = expression.substring(from: expression.index(after: expression.startIndex))
-#else
-            expression = expression.substring(from: expression.index(after: expression.startIndex))
-#endif
             break
           }
         }
@@ -111,13 +97,7 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
 
       return expression.components(separatedBy: ",").map { component in
         if component.hasSuffix("*") {
-#if swift(>=4.0)
-        return String(component[..<component.index(before: component.endIndex)])
-#elseif swift(>=3.2)
-        return component.substring(to: component.index(before: component.endIndex))
-#else
-        return component.substring(to: component.index(before: component.endIndex))
-#endif
+          return String(component[..<component.index(before: component.endIndex)])
         } else {
           return component
         }
@@ -128,16 +108,8 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
   /// Expand template as a URI Template using the given variables
   public func expand(_ variables: [String: Any]) -> String {
     return regex.substitute(template) { string in
-#if swift(>=4.0)
-        var expression = String(string[string.index(after: string.startIndex)..<string.index(before: string.endIndex)])
-        let firstCharacter = String(expression[..<expression.index(after: expression.startIndex)])
-#elseif swift(>=3.2)
-        var expression = string.substring(with: string.index(after: string.startIndex)..<string.index(before: string.endIndex))
-        let firstCharacter = expression.substring(to: expression.index(after: expression.startIndex))
-#else
-        var expression = string.substring(with: string.index(after: string.startIndex)..<string.index(before: string.endIndex))
-        let firstCharacter = expression.substring(to: expression.index(after: expression.startIndex))
-#endif
+      var expression = String(string[string.index(after: string.startIndex)..<string.index(before: string.endIndex)])
+      let firstCharacter = String(expression[..<expression.index(after: expression.startIndex)])
 
       var op = self.operators.filter {
         if let op = $0.op {
@@ -148,13 +120,7 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
       }.first
 
       if (op != nil) {
-#if swift(>=4.0)
         expression = String(expression[expression.index(after: expression.startIndex)...])
-#elseif swift(>=3.2)
-        expression = expression.substring(from: expression.index(after: expression.startIndex))
-#else
-        expression = expression.substring(from: expression.index(after: expression.startIndex))
-#endif
       } else {
         op = self.operators.first
       }
@@ -164,25 +130,14 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
         var prefix:Int?
 
         if let range = variable.range(of: ":") {
-#if swift(>=4.0)
           prefix = Int(String(variable[range.upperBound...]))
           variable = String(variable[..<range.lowerBound])
-#else
-          prefix = Int(variable.substring(from: range.upperBound))
-          variable = variable.substring(to: range.lowerBound)
-#endif
         }
 
         let explode = variable.hasSuffix("*")
 
         if explode {
-#if swift(>=4.0)
             variable = String(variable[..<variable.index(before: variable.endIndex)])
-#elseif swift(>=3.2)
-            variable = variable.substring(to: variable.index(before: variable.endIndex))
-#else
-            variable = variable.substring(to: variable.index(before: variable.endIndex))
-#endif
         }
 
         if let value: Any = variables[variable] {
@@ -224,13 +179,7 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
     }.first
 
     if op != nil {
-#if swift(>=4.0)
       expression = String(expression[expression.index(after: expression.startIndex)..<expression.endIndex])
-#elseif swift(>=3.2)
-    expression = expression.substring(with: expression.index(after: expression.startIndex)..<expression.endIndex)
-#else
-    expression = expression.substring(with: expression.index(after: expression.startIndex)..<expression.endIndex)
-#endif
     }
 
     let regexes = expression.components(separatedBy: ",").map { variable -> String in
@@ -245,18 +194,9 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
 
     let pattern = regex.substitute(self.template) { expression in
       if expression.hasPrefix("{") && expression.hasSuffix("}") {
-#if swift(>=3.2)
-            let startIndex = expression.index(after: expression.startIndex)
-            let endIndex = expression.index(before: expression.endIndex)
-#else
-            let startIndex = expression.index(after: expression.startIndex)
-            let endIndex = expression.index(before: expression.endIndex)
-#endif
-#if swift(>=4.0)
+        let startIndex = expression.index(after: expression.startIndex)
+        let endIndex = expression.index(before: expression.endIndex)
         return self.regexForExpression(String(expression[startIndex..<endIndex]))
-#else
-        return self.regexForExpression(expression.substring(with: startIndex..<endIndex))
-#endif
       } else {
         return NSRegularExpression.escapedPattern(for: expression)
       }
@@ -280,11 +220,7 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
         var extractedVariables:[String: String] = [:]
 
         for (index, variable) in variables.enumerated() {
-#if swift(>=4.0)
           let range = result.range(at: index + 1)
-#else
-          let range = result.rangeAt(index + 1)
-#endif
           let value = NSString(string: input.substring(with: range)).removingPercentEncoding
           extractedVariables[variable] = value
         }
@@ -297,14 +233,12 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
   }
 }
 
-#if swift(>=4.0)
 extension URITemplate: Codable {
   public func encode(to encoder: Encoder) throws {
     var container = encoder.singleValueContainer()
     try container.encode(template)
   }
 }
-#endif
 
 /// Determine if two URITemplate's are equivalent
 public func ==(lhs:URITemplate, rhs:URITemplate) -> Bool {
@@ -388,22 +322,10 @@ class BaseOperator {
   // Point to overide to expanding a string
   func expand(variable:String, value:String, prefix:Int?) -> String {
     if let prefix = prefix {
-#if swift(>=3.2)
       let valueCount = value.count
-#else
-      let valueCount = value.count
-#endif
       if valueCount > prefix {
-#if swift(>=3.2)
         let index = value.index(value.startIndex, offsetBy: prefix, limitedBy: value.endIndex)
-#else
-        let index = value.index(value.startIndex, offsetBy: prefix, limitedBy: value.endIndex)
-#endif
-#if swift(>=4.0)
         return expand(value: String(value[..<index!]))
-#else
-        return expand(value: value.substring(to: index!))
-#endif
       }
     }
 
@@ -517,11 +439,7 @@ class PathStyleParameterExpansion : BaseOperator, Operator {
   }
 
   override func expand(variable:String, value:String, prefix:Int?) -> String {
-#if swift(>=3.2)
     let valueCount = value.count
-#else
-    let valueCount = value.count
-#endif
     if valueCount > 0 {
       let expandedValue = super.expand(variable: variable, value: value, prefix: prefix)
       return "\(variable)=\(expandedValue)"
