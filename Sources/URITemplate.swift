@@ -11,9 +11,13 @@ import Foundation
 // MARK: URITemplate
 
 /// A data structure to represent an RFC6570 URI template.
-public struct URITemplate : CustomStringConvertible, Equatable, Hashable, ExpressibleByStringLiteral, ExpressibleByExtendedGraphemeClusterLiteral, ExpressibleByUnicodeScalarLiteral {
+public struct URITemplate : RawRepresentable, CustomStringConvertible, Equatable, Hashable, ExpressibleByStringLiteral, ExpressibleByExtendedGraphemeClusterLiteral, ExpressibleByUnicodeScalarLiteral {
+  public let rawValue: String
+
   /// The underlying URI template
-  public let template:String
+  public var template: String {
+    return rawValue
+  }
 
   var regex:NSRegularExpression {
     let expression: NSRegularExpression?
@@ -39,26 +43,30 @@ public struct URITemplate : CustomStringConvertible, Equatable, Hashable, Expres
   }
 
   /// Initialize a URITemplate with the given template
-  public init(template:String) {
-    self.template = template
+  public init(template: String) {
+    self.rawValue = template
+  }
+
+  public init(rawValue: String) {
+    self.rawValue = rawValue
   }
 
   public typealias ExtendedGraphemeClusterLiteralType = StringLiteralType
   public init(extendedGraphemeClusterLiteral value: ExtendedGraphemeClusterLiteralType) {
-    template = value
+    rawValue = value
   }
 
   public typealias UnicodeScalarLiteralType = StringLiteralType
   public init(unicodeScalarLiteral value: UnicodeScalarLiteralType) {
-    template = value
+    rawValue = value
   }
 
   public init(stringLiteral value: StringLiteralType) {
-    template = value
+    rawValue = value
   }
 
   public init(from decoder: Decoder) throws {
-    self.template = try decoder.singleValueContainer().decode(String.self)
+    rawValue = try decoder.singleValueContainer().decode(String.self)
   }
 
   /// Returns a description of the URITemplate
