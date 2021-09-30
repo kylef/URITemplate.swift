@@ -1,5 +1,11 @@
 # Changelog for URITemplate
 
+## 3.0.1 (2021-09-30)
+
+### Enhancements
+
+* URITemplate is now raw convertible.
+
 ## 3.0.0
 
 ### Breaking
